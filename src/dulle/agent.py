@@ -225,8 +225,9 @@ class DullEAgent:
         elif mode == ActionType.VERIFY:
             return self._execute_verify_step(step)
         elif mode == ActionType.WAIT:
-            time.sleep(2)
-            step.result = "Waited."
+            wait_s = 3 if "load" in step.description.lower() else 2
+            time.sleep(wait_s)
+            step.result = f"Waited {wait_s}s."
             return True
         else:
             # Hybrid: try CLI first if there's a hint, then GUI
@@ -253,9 +254,15 @@ class DullEAgent:
 
         if result.success:
             step.result = result.output[:200]
-            # Give app a moment to start if it's a launch command
-            if cmd.strip().lower().startswith("start"):
-                time.sleep(1.5)
+            # Give app time to start — browsers with URLs need longer
+            lower = cmd.strip().lower()
+            if lower.startswith("start"):
+                has_url = "http" in lower or ".com" in lower or ".org" in lower
+                has_browser = any(b in lower for b in ("chrome", "msedge", "firefox", "brave"))
+                if has_url or has_browser:
+                    time.sleep(4)
+                else:
+                    time.sleep(2)
             return True
         else:
             step.error = result.stderr[:200]
@@ -395,30 +402,67 @@ class DullEAgent:
         step.error = f"Hit iteration limit ({self.settings.max_iterations})."
         return False
 
-    def _execute_verify_step(self, step: Step) -> bool:
-        """Take a screenshot and ask the verifier if the state is correct."""
-        screenshot_b64 = self.screen.capture()
-        sys_prompt = verifier_system()
+    def _execute_verify_step(self, step: Step, max_attempts: int = 3) -> bool:
+        """Take a screenshot and ask the verifier if the state is correct.
 
-        try:
-            raw = self.llm.vision_chat(
-                system=sys_prompt,
-                user_text=f"Expected state: {step.description}",
-                image_b64=screenshot_b64,
-                temperature=0.1,
-                json_mode=True,
-                role="verifier",
-            )
-        except Exception as exc:
-            step.error = f"Verification LLM error: {exc}"
+        Retries with increasing delays — pages and apps often need a few
+        seconds to finish rendering.
+        """
+        sys_prompt = verifier_system()
+        delays = [0, 3, 5]  # seconds to wait before each attempt
+
+        for attempt in range(max_attempts):
+            if delays[attempt] > 0:
+                console.print(f"  [dim]Waiting {delays[attempt]}s for content to load...[/]")
+                time.sleep(delays[attempt])
+
+            screenshot_b64 = self.screen.capture()
+
+            try:
+                raw = self.llm.vision_chat(
+                    system=sys_prompt,
+                    user_text=(
+                        f"Expected state: {step.description}\n\n"
+                        f"NOTE: If the screen is mostly dark or shows a loading "
+                        f"indicator, consider whether the page/app might still "
+                        f"be loading. Only fail if the content is clearly wrong, "
+                        f"not just slow."
+                    ),
+                    image_b64=screenshot_b64,
+                    temperature=0.1,
+                    json_mode=True,
+                    role="verifier",
+                )
+            except Exception as exc:
+                step.error = f"Verification LLM error: {exc}"
+                return False
+
+            result = parse_json_response(raw)
+            success = result.get("success", False)
+            step.result = result.get("observation", "")
+
+            if success:
+                return True
+
+            confidence = result.get("confidence", 0.5)
+            issue = result.get("issue", "Verification failed.")
+
+            # If confidence is low or it mentions loading, retry
+            if attempt < max_attempts - 1 and (
+                confidence < 0.7
+                or "load" in issue.lower()
+                or "black" in issue.lower()
+                or "dark" in issue.lower()
+                or "blank" in issue.lower()
+            ):
+                console.print(f"  [yellow]Attempt {attempt + 1}: {issue} — retrying...[/]")
+                continue
+
+            step.error = issue
             return False
 
-        result = parse_json_response(raw)
-        success = result.get("success", False)
-        step.result = result.get("observation", "")
-        if not success:
-            step.error = result.get("issue", "Verification failed.")
-        return success
+        step.error = result.get("issue", "Verification failed after retries.")
+        return False
 
     # ── Helpers ──────────────────────────────────────────────────
 
