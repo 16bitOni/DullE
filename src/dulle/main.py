@@ -44,12 +44,22 @@ def main():
         console.print("Copy .env.example to .env and fill in your API key.")
         sys.exit(1)
 
-    # Validate API key
+    # Validate required settings
+    missing = []
     if not settings.api_key:
-        console.print("[red]No API key configured.[/]")
-        console.print("Set your key in .env:")
-        console.print("  DULLE_API_KEY=sk-...")
-        console.print("  DULLE_BASE_URL=https://your-endpoint.com/v1")
+        missing.append("DULLE_API_KEY")
+    if not settings.base_url:
+        missing.append("DULLE_BASE_URL")
+    if not settings.executor_model:
+        missing.append("DULLE_EXECUTOR_MODEL")
+    if not settings.planner_model:
+        missing.append("DULLE_PLANNER_MODEL")
+    if not settings.verifier_model:
+        missing.append("DULLE_VERIFIER_MODEL")
+
+    if missing:
+        console.print(f"[red]Missing required config:[/] {', '.join(missing)}")
+        console.print("Copy .env.example to .env and fill in your values.")
         sys.exit(1)
 
     # Set up logging
@@ -94,13 +104,17 @@ def main():
 
         try:
             result = agent.run(command)
+            usage = result.token_usage
+            token_info = ""
+            if usage and usage.get("total_tokens"):
+                token_info = f" tokens={usage['total_tokens']:,}"
             logger.info(
                 f"Task completed={result.completed} "
                 f"steps={len(result.steps)} "
-                f"duration={result.duration_s:.1f}s"
+                f"duration={result.duration_s:.1f}s{token_info}"
             )
         except KeyboardInterrupt:
-            console.print("\n[yellow]Task interrupted.[/]")
+            console.print("\n[yellow]Task interrupted. Keyboard/mouse state cleaned up.[/]")
         except Exception as exc:
             console.print(f"\n[red]Error:[/] {exc}")
             logger.exception("Task failed")

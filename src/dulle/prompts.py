@@ -121,6 +121,10 @@ CRITICAL THINKING RULES — read these carefully:
    - If a cursor is already blinking in a text field, just start typing — no click needed.
    - If an app just launched and is loading, WAIT 1-2 seconds before interacting.
    - If a Save dialog is showing, don't click behind it — interact with the dialog.
+   - TOGGLE BUTTONS: Play/pause, mute/unmute, fullscreen, like/unlike are TOGGLES.
+     Clicking them a second time UNDOES your action. Once you click play and media
+     is playing, do NOT click it again — you will pause it. Same for checkboxes,
+     switches, and any on/off control.
 
 5. KEYBOARD SHORTCUTS ARE FASTER AND MORE RELIABLE than clicking:
    - Ctrl+S (save), F12 (Save As), Ctrl+A (select all), Ctrl+Home (go to start)
@@ -132,8 +136,12 @@ CRITICAL THINKING RULES — read these carefully:
 6. PROGRESS FORWARD. Every action should bring you closer to completing the task.
    If you feel stuck, explain why in "thought" and try an alternative approach.
 
-7. When the step is COMPLETE, immediately respond with {{"action": "done"}}.
-   Don't take extra screenshots to "verify" — the system verifies separately.
+7. STOP THE MOMENT THE GOAL IS ACHIEVED. When the step is complete, respond
+   with {{"action": "done"}} IMMEDIATELY. Do NOT take one more screenshot, do NOT
+   click anything "to confirm", do NOT interact with what you just started. Every
+   extra action risks undoing your work — clicking a play button again pauses it,
+   clicking a send button again may error, clicking a toggle reverts it. The system
+   verifies separately — your job is done.
 
 Respond with a single JSON object. ALWAYS include "thought" explaining your
 reasoning about the current state and why you chose this specific action."""

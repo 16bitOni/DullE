@@ -59,6 +59,7 @@ class TaskResult:
     steps: list[Step] = field(default_factory=list)
     completed: bool = False
     total_cost_usd: float = 0.0
+    token_usage: dict[str, Any] = field(default_factory=dict)
     started_at: datetime = field(default_factory=datetime.now)
     ended_at: datetime | None = None
 

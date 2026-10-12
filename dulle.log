@@ -9,3 +9,69 @@
 2026-10-11 23:47:10 | INFO    | Task completed=True steps=8 duration=156.1s
 2026-10-11 23:51:37 | INFO    | Task completed=False steps=8 duration=13.2s
 2026-10-11 23:52:44 | INFO    | Task completed=False steps=9 duration=13.8s
+2026-10-12 01:50:26 | INFO    | Audit trail: audit_trail\20261012_015026_can_you_open_spotify_can_play_your_favourite_song_
+2026-10-12 01:52:18 | INFO    | Task completed=False steps=7 duration=111.6s tokens=49,590
+2026-10-12 01:52:33 | INFO    | Audit trail: audit_trail\20261012_015233_cls
+2026-10-12 01:53:05 | INFO    | Audit trail: audit_trail\20261012_015305_open_spotify_and_play_your_favourite_music
+2026-10-12 01:53:49 | INFO    | Task completed=True steps=4 duration=44.0s tokens=81,459
+2026-10-12 01:56:52 | INFO    | Audit trail: audit_trail\20261012_015652_can_you_open_youtube_and_play_your_favourite_docum
+2026-10-12 01:57:34 | INFO    | Task completed=False steps=4 duration=41.9s tokens=98,076
+2026-10-12 01:58:03 | INFO    | Audit trail: audit_trail\20261012_015803_can_you_open_youtube_and_search_for_a_good_documen
+2026-10-12 01:59:29 | INFO    | Audit trail: audit_trail\20261012_015929_open_youtube_from_person1_profile_in_chrome_and_pl
+2026-10-12 01:59:49 | INFO    | Task completed=False steps=7 duration=19.8s tokens=117,983
+2026-10-12 02:00:32 | INFO    | Audit trail: audit_trail\20261012_020032_open_youtube_from_person1_profile_in_chrome_and_pl
+2026-10-12 02:00:48 | INFO    | Task completed=False steps=9 duration=16.0s tokens=121,185
+2026-10-12 02:03:04 | INFO    | Audit trail: audit_trail\20261012_020304_play_some_good_mr_beast_video_at_70_volume_in_yout
+2026-10-12 02:03:35 | INFO    | Task completed=False steps=7 duration=30.5s tokens=133,427
+2026-10-12 02:04:09 | INFO    | Audit trail: audit_trail\20261012_020409_open_youtube_in_person_1_profile
+2026-10-12 02:04:20 | INFO    | Task completed=True steps=1 duration=10.8s tokens=136,021
+2026-10-12 02:05:23 | INFO    | Audit trail: audit_trail\20261012_020523_open_chrome_from_gui_open_the_person_1_profile_nam
+2026-10-12 02:06:34 | ERROR   | LLM call failed: 
+2026-10-12 02:06:55 | INFO    | Audit trail: audit_trail\20261012_020655_play_some_good_mr_beast_video_at_70_volume_in_yout
+2026-10-12 02:07:39 | INFO    | Task completed=False steps=7 duration=43.6s tokens=212,219
+2026-10-12 02:07:56 | INFO    | Audit trail: audit_trail\20261012_020756_can_you_open_youtube_and_search_for_a_good_documen
+2026-10-12 02:09:25 | INFO    | Task completed=True steps=5 duration=89.4s tokens=290,888
+2026-10-12 10:08:49 | INFO    | Audit trail: audit_trail\20261012_100849_open_youtube_and_play_a_morning_upbeat_dj_music
+2026-10-12 10:13:00 | ERROR   | LLM call failed: 
+2026-10-12 10:14:58 | INFO    | Audit trail: audit_trail\20261012_101458_open_youtube_and_play_a_morning_upbeat_dj_music
+2026-10-12 10:15:29 | INFO    | Task completed=False steps=3 duration=30.6s tokens=551,703
+2026-10-12 10:15:53 | INFO    | Audit trail: audit_trail\20261012_101553_open_youtube_and_play_a_morning_upbeat_dj_music
+2026-10-12 10:16:38 | INFO    | Task completed=True steps=2 duration=45.7s tokens=602,468
+2026-10-12 10:22:21 | INFO    | Loaded 9 knowledge entries from knowledge.yaml
+2026-10-12 10:22:58 | INFO    | Audit trail: audit_trail\20261012_102258_open_youtube_and_a_morning_upbeat_dj
+2026-10-12 10:23:39 | ERROR   | LLM call failed: Error code: 400 - {'error': {'message': 'Bedrock (qwen.qwen3-vl-235b-a22b): The model returned the following errors: {"error":{"code":"validation_error","message":"Failed to buffer the request body: length limit exceeded","param":null,"type":"invalid_request_error"}}', 'type': 'invalid_request_error', 'param': None, 'code': 'bedrock_validation_error'}}
+2026-10-12 10:23:57 | ERROR   | LLM call failed: Error code: 400 - {'error': {'message': 'Bedrock (qwen.qwen3-vl-235b-a22b): The model returned the following errors: {"error":{"code":"validation_error","message":"Failed to buffer the request body: length limit exceeded","param":null,"type":"invalid_request_error"}}', 'type': 'invalid_request_error', 'param': None, 'code': 'bedrock_validation_error'}}
+2026-10-12 10:23:57 | INFO    | Task completed=False steps=4 duration=59.5s tokens=24,438
+2026-10-12 10:26:17 | INFO    | Audit trail: audit_trail\20261012_102617_open_youtube_and_play_a_morning_upbeat_dj
+2026-10-12 10:27:08 | ERROR   | LLM call failed: Error code: 400 - {'error': {'message': 'Bedrock (qwen.qwen3-vl-235b-a22b): The model returned the following errors: {"error":{"code":"validation_error","message":"Failed to buffer the request body: length limit exceeded","param":null,"type":"invalid_request_error"}}', 'type': 'invalid_request_error', 'param': None, 'code': 'bedrock_validation_error'}}
+2026-10-12 10:27:29 | ERROR   | LLM call failed: Error code: 400 - {'error': {'message': 'Bedrock (qwen.qwen3-vl-235b-a22b): The model returned the following errors: {"error":{"code":"validation_error","message":"Failed to buffer the request body: length limit exceeded","param":null,"type":"invalid_request_error"}}', 'type': 'invalid_request_error', 'param': None, 'code': 'bedrock_validation_error'}}
+2026-10-12 10:27:29 | INFO    | Task completed=False steps=3 duration=72.3s tokens=58,938
+2026-10-12 10:27:29 | INFO    | Audit trail: audit_trail\20261012_102729_youtubecom
+2026-10-12 10:28:01 | ERROR   | LLM call failed: Error code: 400 - {'error': {'message': 'Bedrock (qwen.qwen3-vl-235b-a22b): The model returned the following errors: {"error":{"code":"validation_error","message":"Failed to buffer the request body: length limit exceeded","param":null,"type":"invalid_request_error"}}', 'type': 'invalid_request_error', 'param': None, 'code': 'bedrock_validation_error'}}
+2026-10-12 10:28:23 | ERROR   | LLM call failed: Error code: 400 - {'error': {'message': 'Bedrock (qwen.qwen3-vl-235b-a22b): The model returned the following errors: {"error":{"code":"validation_error","message":"Failed to buffer the request body: length limit exceeded","param":null,"type":"invalid_request_error"}}', 'type': 'invalid_request_error', 'param': None, 'code': 'bedrock_validation_error'}}
+2026-10-12 10:28:26 | WARNING | Failed to parse: {
+  "action": "click",
+  "coordinate": [698, 48]},
+  "thought": "The browser is already open and dis
+2026-10-12 10:28:51 | INFO    | Task completed=True steps=4 duration=82.2s tokens=107,460
+2026-10-12 10:28:51 | INFO    | Audit trail: audit_trail\20261012_102851_youtubecom
+2026-10-12 10:29:13 | INFO    | Task completed=True steps=1 duration=22.2s tokens=112,869
+2026-10-12 10:34:43 | INFO    | Loaded 9 knowledge entries from knowledge.yaml
+2026-10-12 10:35:17 | INFO    | Audit trail: audit_trail\20261012_103517_open_youtube_and_play_a_upbeat_morning_dj_music
+2026-10-12 10:36:04 | WARNING | Failed to parse: {"action": "click", "coordinate": [503, 977], "thought": "The task is to navigate to YouTube. The cu
+2026-10-12 10:36:38 | ERROR   | LLM call failed: 
+2026-10-12 10:37:16 | INFO    | Audit trail: audit_trail\20261012_103716_open_youtube_and_play_a_upbeat_morning_dj_music
+2026-10-12 10:38:22 | INFO    | Task completed=True steps=4 duration=65.8s tokens=99,355
+2026-10-12 10:38:22 | INFO    | Audit trail: audit_trail\20261012_103822_youtubecom
+2026-10-12 10:38:37 | ERROR   | LLM call failed: 
+2026-10-12 10:39:03 | INFO    | Audit trail: audit_trail\20261012_103903_open_youtube_and_play_a_upbeat_morning_dj_music
+2026-10-12 10:39:39 | INFO    | Task completed=True steps=4 duration=36.4s tokens=146,518
+2026-10-12 10:41:10 | INFO    | Loaded 9 knowledge entries from knowledge.yaml
+2026-10-12 10:41:41 | INFO    | Audit trail: audit_trail\20261012_104141_open_youtube_and_play_a_morning_upbeat_dj_music
+2026-10-12 10:42:30 | ERROR   | LLM call failed: 
+2026-10-12 10:42:48 | INFO    | Loaded 9 knowledge entries from knowledge.yaml
+2026-10-12 10:43:19 | INFO    | Audit trail: audit_trail\20261012_104319_open_youtube_and_play_a_morning_upbeat_dj_music
+2026-10-12 10:43:36 | INFO    | Task completed=True steps=2 duration=16.8s tokens=5,074
+2026-10-12 10:45:09 | INFO    | Loaded 9 knowledge entries from knowledge.yaml
+2026-10-12 10:45:43 | INFO    | Audit trail: audit_trail\20261012_104543_open_youtube_and_play_upbeat_morning_dj_music
+2026-10-12 10:46:32 | INFO    | Task completed=True steps=4 duration=49.0s tokens=36,621

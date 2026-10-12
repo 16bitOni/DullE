@@ -1,0 +1,84 @@
+# ─────────────────────────────────────────────────────────────
+# DullE — Personal Knowledge Base
+# ─────────────────────────────────────────────────────────────
+#
+# Add facts about YOUR setup here. The agent reads this file
+# before every task and uses relevant entries to make better
+# decisions.
+#
+# Each entry has:
+#   fact:     The actual knowledge (what the agent should know)
+#   tags:     Keywords for matching — the agent finds entries by
+#             comparing these against your command text
+#   app:      (optional) Which app this relates to
+#   context:  (optional) Extra detail about when/why this matters
+#
+# The agent only pulls in entries that match your current task,
+# so feel free to add as many as you want — it won't slow down
+# unrelated tasks.
+# ─────────────────────────────────────────────────────────────
+
+# ── Subscriptions & accounts ─────────────────────────────────
+
+- fact: "I have YouTube Premium — there are no ads, no need to look for skip buttons or close ad overlays"
+  tags: [youtube, video, music, premium, ads]
+  app: chrome
+  context: "Skip any ad-handling steps when planning YouTube tasks"
+
+- fact: "I have Spotify Premium — I can play any song on demand without shuffle"
+  tags: [spotify, music, premium, songs, playlist]
+  app: spotify
+
+# ── Browser setup ────────────────────────────────────────────
+
+- fact: "My default Chrome profile is 'Default' — it's the one that opens automatically"
+  tags: [chrome, browser, profile, default]
+  app: chrome
+
+# - fact: "Chrome Profile 2 is my work profile — use it for work-related browsing"
+#   tags: [chrome, browser, profile, work]
+#   app: chrome
+#   context: "Launch with: start chrome --profile-directory=\"Profile 2\""
+
+- fact: "My default browser is Chrome, not Edge"
+  tags: [browser, default, chrome, edge, web, internet]
+  app: chrome
+
+# ── Contacts & communication ─────────────────────────────────
+
+# - fact: "Mom's contact name on WhatsApp is 'Mamoni'"
+#   tags: [whatsapp, mom, mother, contact, message, send]
+#   app: whatsapp
+#   context: "Search for 'Mamoni' in WhatsApp contacts"
+
+# - fact: "My work email is subha@company.com"
+#   tags: [email, work, gmail, outlook, send]
+
+# ── File paths & folders ─────────────────────────────────────
+
+- fact: "My Downloads folder is at C:\\Users\\subha\\Downloads"
+  tags: [download, downloads, save, file, folder, path]
+  context: "Use this path when saving files to Downloads"
+
+- fact: "My Documents folder is at C:\\Users\\subha\\Documents"
+  tags: [documents, document, save, file, folder, path]
+
+# - fact: "I keep project files in D:\\Projects"
+#   tags: [project, projects, code, work, folder]
+
+# ── App preferences ──────────────────────────────────────────
+
+- fact: "I prefer dark mode in all apps"
+  tags: [theme, dark, mode, appearance, settings]
+
+- fact: "Word auto-saves are enabled — no need to manually save frequently"
+  tags: [word, save, autosave, document]
+  app: word
+
+# ── System info ──────────────────────────────────────────────
+
+- fact: "My Windows username is 'subha'"
+  tags: [username, user, windows, account, path]
+
+# ── Add your own below ───────────────────────────────────────
+

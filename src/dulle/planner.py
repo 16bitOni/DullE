@@ -19,17 +19,41 @@ def plan_task(
     llm: LLMClient,
     screen_info: dict,
     settings: Settings,
+    screen_description: str | None = None,
+    knowledge_text: str = "",
 ) -> list[Step]:
     """Break a user command into execution steps.
+
+    Args:
+        user_command: The natural-language command from the user.
+        llm: The LLM client.
+        screen_info: Screen dimensions dict.
+        settings: DullE settings.
+        screen_description: Optional description of what's currently on screen,
+            so the planner can skip steps for apps already open.
+        knowledge_text: Relevant entries from the user's knowledge base.
 
     Returns a list of Step objects ready for the agent loop.
     """
     system = planner_system(screen_info)
+    if knowledge_text:
+        system += "\n\n" + knowledge_text
+
+    message = user_command
+    if screen_description:
+        message = (
+            f"{user_command}\n\n"
+            f"CURRENT SCREEN STATE (what is already visible):\n"
+            f"{screen_description}\n\n"
+            f"Take this into account — do NOT plan steps for things "
+            f"that are already done (e.g., if Chrome is already open, "
+            f"skip the 'open Chrome' step)."
+        )
 
     raw = llm.text_chat(
         role="planner",
         system=system,
-        user_message=user_command,
+        user_message=message,
         temperature=0.3,
     )
 
@@ -41,6 +65,32 @@ def plan_task(
         steps = steps[: settings.max_steps]
 
     return steps
+
+
+def describe_screen(llm: LLMClient, screenshot_b64: str) -> str:
+    """Ask the executor model to describe what's currently on screen.
+
+    Used to give the planner context about the current state so it
+    doesn't plan redundant steps.
+    """
+    try:
+        raw = llm.vision_chat(
+            system=(
+                "Describe what you see on this Windows desktop screenshot in 2-3 sentences. "
+                "Focus on: which apps are open, what windows are visible, what's in focus. "
+                "Be factual and specific. Example: 'Chrome is open with two tabs (Gmail and "
+                "Google Docs). The Gmail tab is active showing the inbox. The taskbar shows "
+                "Word and File Explorer are also running.'"
+            ),
+            user_text="Describe the current screen state.",
+            image_b64=screenshot_b64,
+            temperature=0.1,
+            json_mode=False,
+            role="executor",
+        )
+        return raw.strip()
+    except Exception:
+        return ""
 
 
 def _parse_plan(raw_text: str) -> list[Step]:

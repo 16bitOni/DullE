@@ -12,20 +12,25 @@ Orchestrates the plan-execute-verify cycle:
 from __future__ import annotations
 
 import json
+import signal
 import time
+from contextlib import contextmanager
 from datetime import datetime
 from typing import Any
 
+import pyautogui
 from loguru import logger
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
+from dulle.audit import AuditTrail
 from dulle.config import Settings
 from dulle.executor import ActionExecutor
+from dulle.knowledge import KnowledgeBase
 from dulle.llm import LLMClient, parse_json_response
 from dulle.models import ActionResult, ActionType, Step, StepStatus, TaskResult
-from dulle.planner import plan_task
+from dulle.planner import describe_screen, plan_task
 from dulle.prompts import executor_system, verifier_system
 from dulle.screen import ScreenCapture
 from dulle.shell import run_command
@@ -146,6 +151,44 @@ def _prune_old_images(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return pruned
 
 
+# ── Graceful interrupt ───────────────────────────────────────────
+
+class _InterruptRequested(Exception):
+    """Raised when the user presses Ctrl+C during a step."""
+    pass
+
+
+def _release_all_keys():
+    """Release any keys that might be held down after an interrupt."""
+    for key in ("ctrl", "shift", "alt", "win"):
+        try:
+            pyautogui.keyUp(key)
+        except Exception:
+            pass
+
+
+@contextmanager
+def _interrupt_guard():
+    """Context manager that catches Ctrl+C and cleans up pyautogui state."""
+    interrupted = False
+
+    def _handler(signum, frame):
+        nonlocal interrupted
+        interrupted = True
+        raise _InterruptRequested()
+
+    old_handler = signal.signal(signal.SIGINT, _handler)
+    try:
+        yield
+    except _InterruptRequested:
+        pass
+    finally:
+        signal.signal(signal.SIGINT, old_handler)
+        if interrupted:
+            _release_all_keys()
+            raise KeyboardInterrupt("Task interrupted by user.")
+
+
 # ── Agent ────────────────────────────────────────────────────────
 
 class DullEAgent:
@@ -156,10 +199,16 @@ class DullEAgent:
         self.screen = ScreenCapture(self.settings)
         self.llm = LLMClient(self.settings)
         self.executor = ActionExecutor(self.screen, self.settings)
+        self.knowledge = KnowledgeBase(self.settings.knowledge_file)
 
     def run(self, user_command: str) -> TaskResult:
         """Execute a full user command end-to-end."""
         task = TaskResult(command=user_command)
+        audit = AuditTrail(
+            self.settings.audit_trail_dir, user_command,
+            enabled=self.settings.enable_audit_trail,
+        )
+
         console.print(Panel(
             f"[bold cyan]{user_command}[/]",
             title="DullE Task", border_style="cyan",
@@ -167,10 +216,33 @@ class DullEAgent:
 
         # ── Phase 1: Plan ────────────────────────────────────────
         console.print("\n[bold yellow]Phase 1:[/] Planning steps...\n")
+
+        # Retrieve relevant knowledge for this task
+        self._knowledge_text = ""
+        relevant_knowledge = self.knowledge.retrieve(user_command)
+        if relevant_knowledge:
+            self._knowledge_text = self.knowledge.format_for_prompt(relevant_knowledge)
+            console.print(f"  [dim]Knowledge: {len(relevant_knowledge)} relevant entries loaded[/]")
+
+        # Give the planner context about what's already on screen
+        screen_desc = None
+        try:
+            console.print("  [dim]Scanning current screen...[/]")
+            initial_screenshot = self.screen.capture()
+            audit.save_screenshot(initial_screenshot, step=0, iteration=0,
+                                  label="pre_plan", fmt=self.settings.screenshot_format)
+            screen_desc = describe_screen(self.llm, initial_screenshot)
+            if screen_desc:
+                console.print(f"  [dim]Screen: {screen_desc[:120]}[/]")
+        except Exception as exc:
+            logger.warning(f"Screen description failed (non-fatal): {exc}")
+
         try:
             steps = plan_task(
                 user_command, self.llm,
                 self.screen.info, self.settings,
+                screen_description=screen_desc,
+                knowledge_text=self._knowledge_text,
             )
         except Exception as exc:
             console.print(f"[red]Planning failed:[/] {exc}")
@@ -180,6 +252,11 @@ class DullEAgent:
 
         task.steps = steps
         self._print_plan(steps)
+        audit.save_plan([
+            {"step": s.index, "description": s.description,
+             "action_type": s.action_type.value, "cli_command": s.cli_command}
+            for s in steps
+        ])
 
         # ── Phase 2: Execute each step ───────────────────────────
         console.print("\n[bold yellow]Phase 2:[/] Executing steps...\n")
@@ -188,7 +265,7 @@ class DullEAgent:
             step.started_at = datetime.now()
             step.status = StepStatus.RUNNING
 
-            success = self._execute_step(step)
+            success = self._execute_step(step, audit)
 
             step.ended_at = datetime.now()
             step.status = StepStatus.SUCCESS if success else StepStatus.FAILED
@@ -197,10 +274,18 @@ class DullEAgent:
             console.print(f"  Result: {status_icon} — {step.result or step.error}\n")
 
             if not success:
-                # Try once more
-                console.print("  [yellow]Retrying...[/]")
+                # Try once more — escalate to heavy model if available
                 step.retries += 1
-                success = self._execute_step(step)
+                escalated = self.llm.escalate_executor()
+                if escalated:
+                    console.print(
+                        f"  [yellow]Retrying with stronger model "
+                        f"({self.settings.executor_model_heavy})...[/]"
+                    )
+                else:
+                    console.print("  [yellow]Retrying...[/]")
+                success = self._execute_step(step, audit)
+                self.llm.reset_executor()
                 step.status = StepStatus.SUCCESS if success else StepStatus.FAILED
                 if not success:
                     console.print(f"  [red]Step failed after retry.[/] Stopping.\n")
@@ -209,36 +294,50 @@ class DullEAgent:
         # ── Phase 3: Summary ─────────────────────────────────────
         task.completed = all(s.status == StepStatus.SUCCESS for s in steps)
         task.ended_at = datetime.now()
+        task.token_usage = self.llm.usage.summary()
         self._print_summary(task)
+
+        audit.save_manifest({
+            "command": task.command,
+            "completed": task.completed,
+            "duration_s": task.duration_s,
+            "token_usage": task.token_usage,
+            "steps": [
+                {"index": s.index, "description": s.description,
+                 "status": s.status.value, "result": s.result, "error": s.error}
+                for s in task.steps
+            ],
+        })
         return task
 
     # ── Step execution ───────────────────────────────────────────
 
-    def _execute_step(self, step: Step) -> bool:
+    def _execute_step(self, step: Step, audit: AuditTrail) -> bool:
         """Execute a single step. Returns True if succeeded."""
         mode = step.action_type
 
-        if mode == ActionType.CLI and step.cli_command:
-            return self._execute_cli_step(step)
-        elif mode == ActionType.GUI:
-            return self._execute_gui_step(step)
-        elif mode == ActionType.VERIFY:
-            return self._execute_verify_step(step)
-        elif mode == ActionType.WAIT:
-            wait_s = 3 if "load" in step.description.lower() else 2
-            time.sleep(wait_s)
-            step.result = f"Waited {wait_s}s."
-            return True
-        else:
-            # Hybrid: try CLI first if there's a hint, then GUI
-            if step.cli_command:
-                ok = self._execute_cli_step(step)
-                if ok:
-                    return True
-                console.print("  [yellow]CLI didn't work, trying GUI...[/]")
-            return self._execute_gui_step(step)
+        with _interrupt_guard():
+            if mode == ActionType.CLI and step.cli_command:
+                return self._execute_cli_step(step, audit)
+            elif mode == ActionType.GUI:
+                return self._execute_gui_step(step, audit)
+            elif mode == ActionType.VERIFY:
+                return self._execute_verify_step(step, audit)
+            elif mode == ActionType.WAIT:
+                wait_s = 3 if "load" in step.description.lower() else 2
+                time.sleep(wait_s)
+                step.result = f"Waited {wait_s}s."
+                return True
+            else:
+                # Hybrid: try CLI first if there's a hint, then GUI
+                if step.cli_command:
+                    ok = self._execute_cli_step(step, audit)
+                    if ok:
+                        return True
+                    console.print("  [yellow]CLI didn't work, trying GUI...[/]")
+                return self._execute_gui_step(step, audit)
 
-    def _execute_cli_step(self, step: Step) -> bool:
+    def _execute_cli_step(self, step: Step, audit: AuditTrail) -> bool:
         """Run a CLI command directly."""
         cmd = step.cli_command
         if not cmd:
@@ -251,6 +350,9 @@ class DullEAgent:
             skip_confirmation=False,
             confirm_callback=self._confirm,
         )
+
+        audit.save_action(step.index, 0, {"action": "cli", "command": cmd},
+                          {"success": result.success, "output": result.output[:200]})
 
         if result.success:
             step.result = result.output[:200]
@@ -268,7 +370,7 @@ class DullEAgent:
             step.error = result.stderr[:200]
             return False
 
-    def _execute_gui_step(self, step: Step) -> bool:
+    def _execute_gui_step(self, step: Step, audit: AuditTrail) -> bool:
         """Run the vision-based agentic loop for a GUI step.
 
         This maintains a multi-turn conversation so the model can see
@@ -276,9 +378,14 @@ class DullEAgent:
         and injects correction messages.
         """
         sys_prompt = executor_system(self.screen.info)
+        if self._knowledge_text:
+            sys_prompt += "\n\n" + self._knowledge_text
+        step_deadline = time.monotonic() + self.settings.step_timeout_s
 
         # Take initial screenshot
         screenshot_b64 = self.screen.capture()
+        audit.save_screenshot(screenshot_b64, step.index, 0,
+                              fmt=self.settings.screenshot_format)
 
         # Build the first user message with screenshot
         conversation: list[dict[str, Any]] = [
@@ -296,6 +403,18 @@ class DullEAgent:
         action_history: list[dict] = []
 
         for iteration in range(self.settings.max_iterations):
+            # ── Check step timeout ───────────────────────────────
+            remaining = step_deadline - time.monotonic()
+            if remaining <= 0:
+                step.error = f"Step timed out after {self.settings.step_timeout_s:.0f}s."
+                console.print(f"  [red]Timeout![/] {step.error}")
+                return False
+
+            console.print(
+                f"  [dim][{iteration + 1}/{self.settings.max_iterations} "
+                f"· {remaining:.0f}s left][/]"
+            )
+
             # ── Check for loops and inject correction ────────────
             loop_nudge = _detect_loop(action_history)
             if loop_nudge:
@@ -304,6 +423,13 @@ class DullEAgent:
                     "role": "user",
                     "content": loop_nudge,
                 })
+                # Escalate to heavy model after loop detection
+                if not self.llm._executor_escalated:
+                    if self.llm.escalate_executor():
+                        console.print(
+                            f"  [yellow]Escalating to "
+                            f"{self.settings.executor_model_heavy}[/]"
+                        )
 
             # ── Prune old images to keep context manageable ──────
             pruned_convo = _prune_old_images(conversation)
@@ -347,6 +473,10 @@ class DullEAgent:
             # Track for loop detection
             action_history.append(action_dict)
 
+            # Save action to audit trail
+            audit.save_action(step.index, iteration, action_dict,
+                              {"thought": thought})
+
             # ── Check if done ────────────────────────────────────
             if action_type in ("done", "complete", "finished"):
                 step.result = action_dict.get("summary", "Step completed.")
@@ -359,6 +489,8 @@ class DullEAgent:
             if result.screenshot_b64:
                 # Action returned a screenshot (screenshot/zoom actions)
                 feedback_text = f"Action '{action_type}' executed. Here is the result."
+                audit.save_screenshot(result.screenshot_b64, step.index, iteration,
+                                      label="result", fmt=self.settings.screenshot_format)
                 conversation.append(
                     _make_user_msg(feedback_text, result.screenshot_b64,
                                    self.settings.screenshot_format)
@@ -376,6 +508,8 @@ class DullEAgent:
                 # can see what changed
                 time.sleep(0.4)  # Brief pause for UI to update
                 new_screenshot = self.screen.capture()
+                audit.save_screenshot(new_screenshot, step.index, iteration,
+                                      label="after", fmt=self.settings.screenshot_format)
                 if action_type in ("type", "type_text"):
                     typed_text = action_dict.get("text", "")
                     feedback_text = (
@@ -402,7 +536,8 @@ class DullEAgent:
         step.error = f"Hit iteration limit ({self.settings.max_iterations})."
         return False
 
-    def _execute_verify_step(self, step: Step, max_attempts: int = 3) -> bool:
+    def _execute_verify_step(self, step: Step, audit: AuditTrail,
+                             max_attempts: int = 3) -> bool:
         """Take a screenshot and ask the verifier if the state is correct.
 
         Retries with increasing delays — pages and apps often need a few
@@ -417,6 +552,8 @@ class DullEAgent:
                 time.sleep(delays[attempt])
 
             screenshot_b64 = self.screen.capture()
+            audit.save_screenshot(screenshot_b64, step.index, attempt,
+                                  label="verify", fmt=self.settings.screenshot_format)
 
             try:
                 raw = self.llm.vision_chat(
@@ -498,10 +635,20 @@ class DullEAgent:
         panel_style = "green" if task.completed else "red"
         status = "COMPLETED" if task.completed else "INCOMPLETE"
 
+        usage = task.token_usage
+        token_line = ""
+        if usage and usage.get("total_tokens", 0) > 0:
+            token_line = (
+                f"\nTokens:    {usage['total_tokens']:,} "
+                f"({usage['prompt_tokens']:,} in / "
+                f"{usage['completion_tokens']:,} out) "
+                f"across {usage['call_count']} calls"
+            )
+
         lines = [
             f"Status:    [bold]{status}[/]",
             f"Steps:     {ok}/{total} succeeded, {failed} failed",
-            f"Duration:  {task.duration_s:.1f}s",
+            f"Duration:  {task.duration_s:.1f}s{token_line}",
         ]
         console.print(Panel(
             "\n".join(lines),
