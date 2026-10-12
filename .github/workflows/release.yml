@@ -1,0 +1,76 @@
+name: Release
+
+# Triggers on a pushed version tag: git tag v0.2.0 && git push --tags
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  # ── 1. Publish to PyPI ────────────────────────────────────────
+  pypi:
+    name: Publish to PyPI
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write   # Required for trusted publishing (no API token needed)
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Build wheel + sdist
+        run: uv build
+
+      - name: Publish to PyPI
+        run: uv publish
+        # Uses OIDC trusted publishing — set up at pypi.org/manage/project/dulle/settings/publishing/
+
+  # ── 2. Build Windows .exe and attach to GitHub Release ───────
+  exe:
+    name: Build Windows .exe
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Install dependencies (including pyinstaller)
+        run: uv sync --extra dev
+
+      - name: Build .exe
+        run: uv run pyinstaller dulle.spec
+
+      - name: Get version from tag
+        id: version
+        shell: bash
+        run: echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release and upload .exe
+        uses: softprops/action-gh-release@v2
+        with:
+          name: DullE ${{ steps.version.outputs.VERSION }}
+          body: |
+            ## Install
+
+            **Option A — pip / pipx (requires Python 3.11+)**
+            ```bash
+            pipx install dulle
+            ```
+
+            **Option B — standalone .exe (no Python needed)**
+            Download `dulle.exe` below, place it anywhere on your PATH, then:
+            ```
+            dulle "open notepad and type hello"
+            ```
+
+            ## First run
+            Copy `.env.example` to `.env` in the same directory as the exe and fill in your API key.
+
+          files: dist/dulle.exe
+          draft: false
+          prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}

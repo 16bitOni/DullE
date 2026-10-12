@@ -1,8 +1,27 @@
 [project]
 name = "dulle"
 version = "0.1.0"
-description = "Hybrid CLI + Vision Windows Computer Use Agent (multi-model)"
+description = "Hybrid CLI + Vision Windows desktop automation agent"
+readme = "README.md"
+license = { text = "MIT" }
 requires-python = ">=3.11"
+authors = [
+    { name = "16bitoni" }
+]
+keywords = ["windows", "automation", "computer-use", "agent", "llm", "cli"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Desktop Environment",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
 dependencies = [
     # LLM client (single OpenAI-compatible endpoint for all models)
     "openai>=1.50.0",
@@ -24,10 +43,16 @@ dependencies = [
     "pyyaml>=6.0",
 ]
 
+[project.urls]
+Homepage = "https://github.com/16bitoni/DullE"
+Repository = "https://github.com/16bitoni/DullE"
+Issues = "https://github.com/16bitoni/DullE/issues"
+
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0.0",
     "pytest-asyncio>=0.23.0",
+    "pyinstaller>=6.0.0",
 ]
 
 [project.scripts]
