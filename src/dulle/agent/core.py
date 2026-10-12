@@ -12,6 +12,7 @@ from datetime import datetime
 from loguru import logger
 from rich.console import Console
 from rich.panel import Panel
+from rich.prompt import Prompt
 from rich.table import Table
 
 from dulle.agent.steps import execute_step
@@ -99,6 +100,15 @@ class DullEAgent:
         console.print("\n[bold yellow]Phase 2:[/] Executing steps...\n")
         for step in steps:
             console.rule(f"Step {step.index}: {step.description}")
+
+            # Ask user before executing if the planner flagged ambiguity
+            if step.needs_input:
+                answer = Prompt.ask(
+                    f"\n  [bold yellow]Question before step {step.index}:[/] {step.needs_input}"
+                )
+                step.description = f"{step.description} [User provided: {answer}]"
+                console.print(f"  [dim]Got: {answer}[/]\n")
+
             step.started_at = datetime.now()
             step.status = StepStatus.RUNNING
 

@@ -138,6 +138,7 @@ def _parse_plan(raw_text: str) -> list[Step]:
                 description=item.get("description", str(item)),
                 action_type=action_type,
                 cli_command=item.get("cli_hint") or item.get("cli_command"),
+                needs_input=item.get("needs_input", ""),
             )
             steps.append(step)
 

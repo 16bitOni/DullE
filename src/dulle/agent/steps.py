@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING, Any
 
 from loguru import logger
 from rich.console import Console
+from rich.prompt import Prompt
 
 from dulle.agent.batch import execute_action_batch, execute_single_action
 from dulle.agent.context import make_user_msg, prune_old_images
@@ -218,6 +219,28 @@ def execute_gui_step(
             console.print(f"  [dim italic]Think: {thought[:150]}[/]")
 
         conversation.append({"role": "assistant", "content": raw})
+
+        # ── Ask user if agent hit genuine ambiguity ──────────────
+        if action_dict.get("action") == "ask_user":
+            question = action_dict.get("question", "I need clarification to continue.")
+            options = action_dict.get("options", [])
+
+            console.print(f"\n  [bold yellow]Agent needs input:[/] {question}")
+            if options:
+                for i, opt in enumerate(options, 1):
+                    console.print(f"    {i}. {opt}")
+
+            answer = Prompt.ask("  [bold cyan]Your answer[/]")
+            console.print()
+
+            conversation.append({
+                "role": "user",
+                "content": (
+                    f"User answered: {answer}\n\n"
+                    f"Continue the task using this information."
+                ),
+            })
+            continue
 
         actions_list = action_dict.get("actions")
         if isinstance(actions_list, list) and actions_list:

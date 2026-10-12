@@ -33,6 +33,7 @@ class Step:
     description: str
     action_type: ActionType = ActionType.HYBRID
     cli_command: str | None = None        # Pre-planned CLI command if any
+    needs_input: str = ""                 # Non-empty = ask user this before executing
     status: StepStatus = StepStatus.PENDING
     result: str = ""
     error: str = ""

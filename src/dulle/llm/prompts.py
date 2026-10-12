@@ -25,8 +25,20 @@ STEP FORMAT — return a JSON array:
     "action_type": "cli",
     "cli_hint": "powershell Get-StartApps | findstr /i whatsapp",
     "verification": "WhatsApp window appears"
+  }},
+  {{
+    "step": 2,
+    "description": "Send message to contact",
+    "action_type": "gui",
+    "cli_hint": null,
+    "needs_input": "What is the exact name of the contact to message?",
+    "verification": "Message sent"
   }}
 ]
+
+If a step requires information you don't have (contact name, file path, password,
+which option to pick), set "needs_input" to the question to ask the user BEFORE
+that step runs. Leave it out or set to "" if no input is needed.
 
 ACTION TYPES
 - "cli"    — done entirely via shell command. ALWAYS preferred.
@@ -145,6 +157,9 @@ GUI:
   {{"action": "wait", "seconds": 2}}
   {{"action": "drag", "start": [x1, y1], "coordinate": [x2, y2]}}
 
+Ask user:
+  {{"action": "ask_user", "question": "Which folder should I save it to?", "options": ["Downloads", "Desktop", "Documents"]}}
+
 Completion:
   {{"action": "done", "summary": "what was accomplished"}}
 
@@ -194,6 +209,12 @@ RULES
    Ctrl+W close tab, Alt+Tab switch window, Win key opens Start menu.
 5. STOP IMMEDIATELY when the goal is achieved — respond {{"action": "done"}}.
 6. TOGGLE AWARENESS — play/pause, mute, like: clicking twice undoes. Stop after one.
+7. ASK THE USER when you hit genuine ambiguity you cannot resolve from the screen:
+   - Multiple contacts match the name — ask which one
+   - "Save here or somewhere else?" — ask where
+   - Task requires a value you don't have (password, recipient, filename) — ask
+   Use {{"action": "ask_user", "question": "...", "options": [...]}} (options optional).
+   Do NOT ask about things you can figure out yourself from the screen.
 
 Respond with a JSON object. ALWAYS include "thought"."""
 

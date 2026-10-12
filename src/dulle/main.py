@@ -56,6 +56,8 @@ def _parse_args() -> argparse.Namespace:
                         help="Path to eval tasks YAML")
     parser.add_argument("--eval-compare", nargs=2, metavar=("BASELINE", "CURRENT"),
                         help="Compare two eval result directories")
+    parser.add_argument("--auto", "-y", action="store_true",
+                        help="Auto-approve all shell commands (no confirmation prompts)")
     return parser.parse_args()
 
 
@@ -114,9 +116,14 @@ def main():
     # Print config summary
     _print_config(settings)
 
+    # Auto mode — disable all confirmation gates
+    if args.auto or not settings.require_confirmation:
+        settings.require_confirmation = False
+        settings.require_shell_confirmation = False
+        console.print("[dim]Auto mode: all commands approved automatically.[/]\n")
+
     # Eval mode
     if args.eval:
-        # Disable confirmation gates during eval
         settings.require_confirmation = False
         settings.require_shell_confirmation = False
 
