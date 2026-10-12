@@ -75,3 +75,240 @@
 2026-10-12 10:45:09 | INFO    | Loaded 9 knowledge entries from knowledge.yaml
 2026-10-12 10:45:43 | INFO    | Audit trail: audit_trail\20261012_104543_open_youtube_and_play_upbeat_morning_dj_music
 2026-10-12 10:46:32 | INFO    | Task completed=True steps=4 duration=49.0s tokens=36,621
+2026-10-12 16:32:37 | INFO    | Loaded 9 knowledge entries from knowledge.yaml
+2026-10-12 16:32:37 | INFO    | Audit trail: audit_trail\20261012_163237_open_notepad
+2026-10-12 16:33:23 | INFO    | Loaded 9 knowledge entries from knowledge.yaml
+2026-10-12 16:33:23 | INFO    | Audit trail: audit_trail\20261012_163323_open_notepad_and_type_hello_world
+2026-10-12 16:34:25 | ERROR   | LLM call failed: 
+2026-10-12 16:34:36 | INFO    | Loaded 9 knowledge entries from knowledge.yaml
+2026-10-12 16:34:36 | INFO    | Audit trail: audit_trail\20261012_163436_open_notepad
+2026-10-12 16:34:55 | INFO    | Loaded 9 knowledge entries from knowledge.yaml
+2026-10-12 16:34:55 | INFO    | Audit trail: audit_trail\20261012_163455_open_notepad_and_type_hello_world
+2026-10-12 16:36:32 | INFO    | Loaded 9 knowledge entries from knowledge.yaml
+2026-10-12 16:36:32 | INFO    | Audit trail: audit_trail\20261012_163632_open_calculator
+2026-10-12 16:36:51 | INFO    | Loaded 9 knowledge entries from knowledge.yaml
+2026-10-12 16:36:51 | INFO    | Audit trail: audit_trail\20261012_163651_open_chrome_and_go_to_googlecom
+2026-10-12 16:37:12 | INFO    | Loaded 9 knowledge entries from knowledge.yaml
+2026-10-12 16:37:12 | INFO    | Audit trail: audit_trail\20261012_163712_create_a_folder_called_dulle_test_folder_in_my_dow
+2026-10-12 16:37:21 | INFO    | Loaded 9 knowledge entries from knowledge.yaml
+2026-10-12 16:37:21 | INFO    | Audit trail: audit_trail\20261012_163721_open_notepad_type_evaluation_test_and_save_it_as_e
+2026-10-12 16:58:11 | INFO    | Loaded 9 knowledge entries from knowledge.yaml
+2026-10-12 16:58:11 | INFO    | Audit trail: audit_trail\20261012_165811_cuserssubhadocumentssss-firedullevenvscriptsactiva
+2026-10-12 16:58:40 | INFO    | Audit trail: audit_trail\20261012_165840_open_notepad_and_write_hello_world
+2026-10-12 16:58:56 | INFO    | Task completed=False steps=0 duration=15.6s
+2026-10-12 17:06:10 | INFO    | Audit trail: audit_trail\20261012_170610_cls
+2026-10-12 17:06:33 | INFO    | Loaded 9 knowledge entries from knowledge.yaml
+2026-10-12 17:06:54 | INFO    | Audit trail: audit_trail\20261012_170654_open_notepad_and_write_hello_world_and_save_it
+2026-10-12 17:19:51 | INFO    | Loaded 9 knowledge entries from knowledge.yaml
+2026-10-12 17:20:08 | INFO    | Audit trail: audit_trail\20261012_172008_open_notepad_and_write_hello_world_and_save_it
+2026-10-12 17:31:11 | INFO    | Loaded 9 knowledge entries from knowledge.yaml
+2026-10-12 17:31:24 | INFO    | Audit trail: audit_trail\20261012_173124_can_you_open_notepad_and_write_hello_world_and_sav
+2026-10-12 17:31:25 | ERROR   | LLM call failed: Error code: 404 - {'error': {'message': 'Bedrock (us.anthropic.claude-3-5-haiku-20241022-v1:0): This model version has reached the end of its life. Please refer to the AWS documentation for more details.', 'type': 'invalid_request_error', 'param': 'model', 'code': 'model_not_found'}}
+2026-10-12 17:35:41 | INFO    | Loaded 9 knowledge entries from knowledge.yaml
+2026-10-12 17:36:01 | INFO    | Audit trail: audit_trail\20261012_173601_open_notepad_and_write_hello_world_and_save_it
+2026-10-12 17:42:10 | INFO    | Loaded 9 knowledge entries from knowledge.yaml
+2026-10-12 17:42:30 | INFO    | Audit trail: audit_trail\20261012_174230_can_you_open_youtube_and_play_mr_beast_video
+2026-10-12 17:43:58 | WARNING | Failed to parse: I can see the current state:
+
+1. **YouTube is open** in a browser tab showing search results for "Mr
+2026-10-12 17:44:04 | INFO    | Task completed=True steps=4 duration=94.2s tokens=107,756
+2026-10-12 17:44:44 | INFO    | Audit trail: audit_trail\20261012_174444_just_open_the_notepad_and_write_hello_world
+2026-10-12 17:45:01 | INFO    | Task completed=True steps=2 duration=16.2s tokens=117,266
+2026-10-12 17:47:00 | INFO    | Loaded 9 knowledge entries from knowledge.yaml
+2026-10-12 17:47:00 | INFO    | Audit trail: audit_trail\20261012_174700_open_notepad
+2026-10-12 17:47:17 | INFO    | Loaded 9 knowledge entries from knowledge.yaml
+2026-10-12 17:47:17 | INFO    | Audit trail: audit_trail\20261012_174717_open_notepad_and_type_hello_world
+2026-10-12 17:47:36 | INFO    | Loaded 9 knowledge entries from knowledge.yaml
+2026-10-12 17:47:36 | INFO    | Audit trail: audit_trail\20261012_174736_open_calculator
+2026-10-12 17:47:53 | INFO    | Loaded 9 knowledge entries from knowledge.yaml
+2026-10-12 17:47:53 | INFO    | Audit trail: audit_trail\20261012_174753_open_chrome_and_go_to_googlecom
+2026-10-12 17:48:08 | ERROR   | Eval task chrome_new_tab crashed
+Traceback (most recent call last):
+
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+
+  File "C:\Users\subha\Documents\SSS-Fire\DullE\.venv\Scripts\dulle.exe\__main__.py", line 10, in <module>
+
+  File "C:\Users\subha\Documents\SSS-Fire\DullE\src\dulle\main.py", line 124, in main
+    run_eval(
+    └ <function run_eval at 0x00000238EAA777E0>
+
+> File "C:\Users\subha\Documents\SSS-Fire\DullE\src\dulle\eval\runner.py", line 118, in run_eval
+    result = agent.run(command)
+             │     │   └ 'open chrome and go to google.com'
+             │     └ <function DullEAgent.run at 0x00000238EB5C7F60>
+             └ <dulle.agent.DullEAgent object at 0x00000238EEE1BB10>
+
+  File "C:\Users\subha\Documents\SSS-Fire\DullE\src\dulle\agent.py", line 231, in run
+    success = self._execute_step(step, audit)
+              │    │             │     └ <dulle.audit.AuditTrail object at 0x00000238EB6115D0>
+              │    │             └ Step(index=2, description='Navigate to google.com', action_type=<ActionType.HYBRID: 'hybrid'>, cli_command=None, status=<Step...
+              │    └ <function DullEAgent._execute_step at 0x00000238EB5E4040>
+              └ <dulle.agent.DullEAgent object at 0x00000238EEE1BB10>
+
+  File "C:\Users\subha\Documents\SSS-Fire\DullE\src\dulle\agent.py", line 300, in _execute_step
+    return self._execute_gui_step(step, audit)
+           │    │                 │     └ <dulle.audit.AuditTrail object at 0x00000238EB6115D0>
+           │    │                 └ Step(index=2, description='Navigate to google.com', action_type=<ActionType.HYBRID: 'hybrid'>, cli_command=None, status=<Step...
+           │    └ <function DullEAgent._execute_gui_step at 0x00000238EB5E4180>
+           └ <dulle.agent.DullEAgent object at 0x00000238EEE1BB10>
+
+  File "C:\Users\subha\Documents\SSS-Fire\DullE\src\dulle\agent.py", line 467, in _execute_gui_step
+    result = self.executor.execute(action_dict, confirm_callback=self._confirm)
+             │    │        │       │                             │    └ <function DullEAgent._confirm at 0x00000238EB5E42C0>
+             │    │        │       │                             └ <dulle.agent.DullEAgent object at 0x00000238EEE1BB10>
+             │    │        │       └ {'thought': "I can see the current state: Google Chrome is open with a profile selection dialog showing 'Who's using Chrome?'...
+             │    │        └ <function ActionExecutor.execute at 0x00000238EAAA1800>
+             │    └ <dulle.executor.ActionExecutor object at 0x00000238EEE3EE10>
+             └ <dulle.agent.DullEAgent object at 0x00000238EEE1BB10>
+
+  File "C:\Users\subha\Documents\SSS-Fire\DullE\src\dulle\executor.py", line 45, in execute
+    action_type = action.get("action", "").lower()
+                  │      └ <method 'get' of 'dict' objects>
+                  └ {'thought': "I can see the current state: Google Chrome is open with a profile selection dialog showing 'Who's using Chrome?'...
+
+AttributeError: 'dict' object has no attribute 'lower'
+2026-10-12 17:48:18 | INFO    | Loaded 9 knowledge entries from knowledge.yaml
+2026-10-12 17:48:18 | INFO    | Audit trail: audit_trail\20261012_174818_create_a_folder_called_dulle_test_folder_in_my_dow
+2026-10-12 17:48:23 | INFO    | Escalated executor to global.anthropic.claude-sonnet-4-6
+2026-10-12 17:48:28 | INFO    | Loaded 9 knowledge entries from knowledge.yaml
+2026-10-12 17:48:28 | INFO    | Audit trail: audit_trail\20261012_174828_open_notepad_type_evaluation_test_and_save_it_as_e
+2026-10-12 17:49:26 | INFO    | Loaded 9 knowledge entries from knowledge.yaml
+2026-10-12 17:49:26 | INFO    | Audit trail: audit_trail\20261012_174926_open_chrome_go_to_youtubecom_and_search_for_lofi_m
+2026-10-12 17:49:42 | ERROR   | Eval task chrome_youtube_search crashed
+Traceback (most recent call last):
+
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+
+  File "C:\Users\subha\Documents\SSS-Fire\DullE\.venv\Scripts\dulle.exe\__main__.py", line 10, in <module>
+
+  File "C:\Users\subha\Documents\SSS-Fire\DullE\src\dulle\main.py", line 124, in main
+    run_eval(
+    └ <function run_eval at 0x00000238EAA777E0>
+
+> File "C:\Users\subha\Documents\SSS-Fire\DullE\src\dulle\eval\runner.py", line 118, in run_eval
+    result = agent.run(command)
+             │     │   └ "open chrome, go to youtube.com and search for 'lofi music'"
+             │     └ <function DullEAgent.run at 0x00000238EB5C7F60>
+             └ <dulle.agent.DullEAgent object at 0x00000238EEE19110>
+
+  File "C:\Users\subha\Documents\SSS-Fire\DullE\src\dulle\agent.py", line 231, in run
+    success = self._execute_step(step, audit)
+              │    │             │     └ <dulle.audit.AuditTrail object at 0x00000238EEE31010>
+              │    │             └ Step(index=2, description='Navigate to YouTube', action_type=<ActionType.GUI: 'gui'>, cli_command=None, status=<StepStatus.RU...
+              │    └ <function DullEAgent._execute_step at 0x00000238EB5E4040>
+              └ <dulle.agent.DullEAgent object at 0x00000238EEE19110>
+
+  File "C:\Users\subha\Documents\SSS-Fire\DullE\src\dulle\agent.py", line 285, in _execute_step
+    return self._execute_gui_step(step, audit)
+           │    │                 │     └ <dulle.audit.AuditTrail object at 0x00000238EEE31010>
+           │    │                 └ Step(index=2, description='Navigate to YouTube', action_type=<ActionType.GUI: 'gui'>, cli_command=None, status=<StepStatus.RU...
+           │    └ <function DullEAgent._execute_gui_step at 0x00000238EB5E4180>
+           └ <dulle.agent.DullEAgent object at 0x00000238EEE19110>
+
+  File "C:\Users\subha\Documents\SSS-Fire\DullE\src\dulle\agent.py", line 467, in _execute_gui_step
+    result = self.executor.execute(action_dict, confirm_callback=self._confirm)
+             │    │        │       │                             │    └ <function DullEAgent._confirm at 0x00000238EB5E42C0>
+             │    │        │       │                             └ <dulle.agent.DullEAgent object at 0x00000238EEE19110>
+             │    │        │       └ {'thought': "I can see the current state: Google Chrome is open with a 'Who's using Chrome?' profile selection dialog display...
+             │    │        └ <function ActionExecutor.execute at 0x00000238EAAA1800>
+             │    └ <dulle.executor.ActionExecutor object at 0x00000238EEEAF610>
+             └ <dulle.agent.DullEAgent object at 0x00000238EEE19110>
+
+  File "C:\Users\subha\Documents\SSS-Fire\DullE\src\dulle\executor.py", line 45, in execute
+    action_type = action.get("action", "").lower()
+                  │      └ <method 'get' of 'dict' objects>
+                  └ {'thought': "I can see the current state: Google Chrome is open with a 'Who's using Chrome?' profile selection dialog display...
+
+AttributeError: 'dict' object has no attribute 'lower'
+2026-10-12 17:49:53 | INFO    | Loaded 9 knowledge entries from knowledge.yaml
+2026-10-12 17:49:53 | INFO    | Audit trail: audit_trail\20261012_174953_open_word_type_a_short_3-line_letter_to_my_friend_
+2026-10-12 17:50:57 | WARNING | Failed to parse: {"thought": "Great! I can see the cursor is now blinking in the document (visible as a thin vertical
+2026-10-12 17:56:10 | INFO    | Loaded 10 knowledge entries from knowledge.yaml
+2026-10-12 17:56:10 | INFO    | Audit trail: audit_trail\20261012_175610_open_notepad
+2026-10-12 17:56:28 | INFO    | Loaded 10 knowledge entries from knowledge.yaml
+2026-10-12 17:56:28 | INFO    | Audit trail: audit_trail\20261012_175628_open_notepad_and_type_hello_world
+2026-10-12 17:58:25 | INFO    | Loaded 10 knowledge entries from knowledge.yaml
+2026-10-12 17:58:25 | INFO    | Audit trail: audit_trail\20261012_175825_open_notepad
+2026-10-12 17:58:46 | INFO    | Loaded 10 knowledge entries from knowledge.yaml
+2026-10-12 17:58:46 | INFO    | Audit trail: audit_trail\20261012_175846_open_notepad_and_type_hello_world
+2026-10-12 17:59:08 | INFO    | Loaded 10 knowledge entries from knowledge.yaml
+2026-10-12 17:59:08 | INFO    | Audit trail: audit_trail\20261012_175908_open_calculator
+2026-10-12 17:59:25 | INFO    | Loaded 10 knowledge entries from knowledge.yaml
+2026-10-12 17:59:25 | INFO    | Audit trail: audit_trail\20261012_175925_open_chrome_and_go_to_googlecom
+2026-10-12 17:59:39 | WARNING | Failed to parse: {"thought": "I can see the current state: Google Chrome is open with a profile selection dialog show
+2026-10-12 17:59:46 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. My previous click at coordinate (1807, 669)
+2026-10-12 17:59:48 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the 'Person 1' profile b
+2026-10-12 17:59:50 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the 'Person 1' profile b
+2026-10-12 17:59:52 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the 'Person 1' profile b
+2026-10-12 17:59:54 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open showing multiple Chrome profiles. I need to 
+2026-10-12 17:59:56 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the Person 1 profile but
+2026-10-12 17:59:58 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still visible. I need to click on the 'Person 1' profil
+2026-10-12 18:00:00 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the Person 1 profile. Lo
+2026-10-12 18:00:01 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the Person 1 profile but
+2026-10-12 18:00:03 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the Person 1 profile but
+2026-10-12 18:00:05 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the Person 1 profile to 
+2026-10-12 18:00:07 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the Person 1 profile but
+2026-10-12 18:00:09 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the Person 1 profile but
+2026-10-12 18:00:10 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the Person 1 profile but
+2026-10-12 18:00:12 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the Person 1 profile but
+2026-10-12 18:00:14 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the Person 1 profile but
+2026-10-12 18:00:16 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the Person 1 profile but
+2026-10-12 18:00:17 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the Person 1 profile but
+2026-10-12 18:00:19 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the Person 1 profile but
+2026-10-12 18:00:21 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the Person 1 profile but
+2026-10-12 18:00:23 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the Person 1 profile but
+2026-10-12 18:00:24 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the Person 1 profile but
+2026-10-12 18:00:26 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the Person 1 profile but
+2026-10-12 18:00:28 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the Person 1 profile but
+2026-10-12 18:00:30 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the Person 1 profile but
+2026-10-12 18:00:31 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the Person 1 profile but
+2026-10-12 18:00:33 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the Person 1 profile but
+2026-10-12 18:00:35 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the Person 1 profile but
+2026-10-12 18:00:37 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the Person 1 profile but
+2026-10-12 18:00:39 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the Person 1 profile but
+2026-10-12 18:00:41 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the Person 1 profile but
+2026-10-12 18:00:42 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the Person 1 profile but
+2026-10-12 18:00:44 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the Person 1 profile but
+2026-10-12 18:00:46 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the Person 1 profile but
+2026-10-12 18:00:48 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the Person 1 profile but
+2026-10-12 18:00:50 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the Person 1 profile but
+2026-10-12 18:00:52 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the Person 1 profile but
+2026-10-12 18:00:54 | WARNING | Failed to parse: {"thought": "The profile selection dialog is still open. I need to click on the Person 1 profile but
+2026-10-12 18:00:54 | INFO    | Escalated executor to global.anthropic.claude-sonnet-4-6
+2026-10-12 18:01:20 | INFO    | Loaded 10 knowledge entries from knowledge.yaml
+2026-10-12 18:01:20 | INFO    | Audit trail: audit_trail\20261012_180120_create_a_folder_called_dulle_test_folder_in_my_dow
+2026-10-12 18:01:25 | INFO    | Escalated executor to global.anthropic.claude-sonnet-4-6
+2026-10-12 18:01:29 | INFO    | Loaded 10 knowledge entries from knowledge.yaml
+2026-10-12 18:01:29 | INFO    | Audit trail: audit_trail\20261012_180129_open_notepad_type_evaluation_test_and_save_it_as_e
+2026-10-12 18:02:32 | INFO    | Loaded 10 knowledge entries from knowledge.yaml
+2026-10-12 18:02:32 | INFO    | Audit trail: audit_trail\20261012_180232_open_chrome_go_to_youtubecom_and_search_for_lofi_m
+2026-10-12 18:02:54 | WARNING | Failed to parse: {"thought": "I can see the current state: Google Chrome is open with a profile selection dialog show
+2026-10-12 18:03:07 | WARNING | Failed to parse: {"thought": "Good! Chrome has loaded with the Person 1 profile. I can see the Google homepage with a
+2026-10-12 18:04:06 | INFO    | Loaded 10 knowledge entries from knowledge.yaml
+2026-10-12 18:04:06 | INFO    | Audit trail: audit_trail\20261012_180406_open_word_type_a_short_3-line_letter_to_my_friend_
+2026-10-12 18:31:41 | INFO    | Loaded 10 knowledge entries from knowledge.yaml
+2026-10-12 18:31:41 | INFO    | Audit trail: audit_trail\20261012_183141_open_notepad
+2026-10-12 18:31:56 | INFO    | Loaded 10 knowledge entries from knowledge.yaml
+2026-10-12 18:31:56 | INFO    | Audit trail: audit_trail\20261012_183156_open_notepad_and_type_hello_world
+2026-10-12 18:34:07 | INFO    | Escalated executor to global.anthropic.claude-sonnet-4-6
+2026-10-12 18:34:58 | INFO    | Loaded 10 knowledge entries from knowledge.yaml
+2026-10-12 18:34:58 | INFO    | Audit trail: audit_trail\20261012_183458_open_calculator
+2026-10-12 18:35:12 | INFO    | Loaded 10 knowledge entries from knowledge.yaml
+2026-10-12 18:35:12 | INFO    | Audit trail: audit_trail\20261012_183512_open_chrome_and_go_to_googlecom
+2026-10-12 18:35:39 | INFO    | Escalated executor to global.anthropic.claude-sonnet-4-6
+2026-10-12 18:36:09 | INFO    | Loaded 10 knowledge entries from knowledge.yaml
+2026-10-12 18:36:09 | INFO    | Audit trail: audit_trail\20261012_183609_create_a_folder_called_dulle_test_folder_in_my_dow
+2026-10-12 18:36:16 | INFO    | Escalated executor to global.anthropic.claude-sonnet-4-6
+2026-10-12 18:36:20 | INFO    | Loaded 10 knowledge entries from knowledge.yaml
+2026-10-12 18:36:20 | INFO    | Audit trail: audit_trail\20261012_183620_open_notepad_type_evaluation_test_and_save_it_as_e
+2026-10-12 18:37:04 | WARNING | Failed to parse: I can see a text editor window (appears to be a code/text editor) with the file "evaluation-test-uns
+2026-10-12 18:37:47 | INFO    | Escalated executor to global.anthropic.claude-sonnet-4-6
+2026-10-12 18:38:15 | INFO    | Loaded 10 knowledge entries from knowledge.yaml
+2026-10-12 18:38:15 | INFO    | Audit trail: audit_trail\20261012_183815_open_chrome_go_to_youtubecom_and_search_for_lofi_m
+2026-10-12 18:40:24 | INFO    | Escalated executor to global.anthropic.claude-sonnet-4-6
+2026-10-12 18:40:48 | INFO    | Loaded 10 knowledge entries from knowledge.yaml
+2026-10-12 18:40:48 | INFO    | Audit trail: audit_trail\20261012_184048_open_word_type_a_short_3-line_letter_to_my_friend_
+2026-10-12 18:41:03 | WARNING | Failed to parse: I can see Microsoft Word is open with the start screen showing recent documents and templates. The s

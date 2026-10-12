@@ -10,13 +10,17 @@ from __future__ import annotations
 
 import json
 import time
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 from dataclasses import dataclass, field
 from typing import Any
 
 from loguru import logger
 from openai import OpenAI
+from rich.console import Console
 
 from dulle.config import Settings
+
+_console = Console()
 
 MAX_RETRIES = 3
 RETRY_DELAYS = [1, 3, 8]  # seconds between retries (exponential-ish)
@@ -63,6 +67,7 @@ class LLMClient:
         self._client = OpenAI(
             api_key=settings.api_key,
             base_url=settings.base_url,
+            timeout=settings.llm_timeout_s,
         )
         self.usage = TokenUsage()
         self._executor_escalated = False
@@ -92,21 +97,75 @@ class LLMClient:
         self._executor_escalated = False
 
     def _call_with_retry(self, params: dict, role: str) -> Any:
-        """Call the API with retry on transient errors."""
+        """Call the API with retry on transient errors.
+
+        Uses a thread-pool hard timeout as a safety net — if the HTTP
+        client or the endpoint hangs beyond llm_timeout_s, the call is
+        abandoned and an exception is raised instead of freezing forever.
+        """
         model = params.get("model", "unknown")
+        timeout = self.settings.llm_timeout_s
         last_exc = None
 
         for attempt in range(MAX_RETRIES):
+            _console.print(
+                f"  [dim]Calling {role} model ({model})... "
+                f"(attempt {attempt + 1}/{MAX_RETRIES}, "
+                f"timeout {timeout:.0f}s)[/]"
+            )
             try:
-                response = self._client.chat.completions.create(**params)
+                with ThreadPoolExecutor(max_workers=1) as pool:
+                    future = pool.submit(
+                        self._client.chat.completions.create, **params
+                    )
+                    # Poll with short waits so Ctrl+C is not blocked on Windows
+                    deadline = time.monotonic() + timeout
+                    while True:
+                        remaining = deadline - time.monotonic()
+                        if remaining <= 0:
+                            future.cancel()
+                            raise FuturesTimeoutError()
+                        try:
+                            response = future.result(timeout=min(1.0, remaining))
+                            break
+                        except FuturesTimeoutError:
+                            continue
+
                 self.usage.record(response.usage, role, model)
                 return response
+
+            except FuturesTimeoutError:
+                msg = (
+                    f"LLM call timed out after {timeout:.0f}s "
+                    f"(model={model}, role={role})"
+                )
+                _console.print(f"  [red bold]TIMEOUT:[/] {msg}")
+                logger.error(msg)
+                last_exc = TimeoutError(msg)
+                if attempt < MAX_RETRIES - 1:
+                    delay = RETRY_DELAYS[attempt]
+                    _console.print(
+                        f"  [yellow]Retrying in {delay}s "
+                        f"({attempt + 1}/{MAX_RETRIES})...[/]"
+                    )
+                    time.sleep(delay)
+                    continue
+                raise last_exc
+
             except Exception as exc:
                 last_exc = exc
                 status = getattr(exc, "status_code", None)
+                exc_msg = str(exc) or type(exc).__name__
 
                 if status and status in RETRYABLE_STATUS_CODES and attempt < MAX_RETRIES - 1:
                     delay = RETRY_DELAYS[attempt]
+                    _console.print(
+                        f"  [yellow]LLM error (status={status}): {exc_msg[:120]}[/]"
+                    )
+                    _console.print(
+                        f"  [yellow]Retrying in {delay}s "
+                        f"({attempt + 1}/{MAX_RETRIES})...[/]"
+                    )
                     logger.warning(
                         f"LLM call failed (status={status}), "
                         f"retrying in {delay}s (attempt {attempt + 1}/{MAX_RETRIES})"
@@ -114,6 +173,8 @@ class LLMClient:
                     time.sleep(delay)
                     continue
 
+                _console.print(f"  [red bold]LLM call failed:[/] {exc_msg[:200]}")
+                logger.error(f"LLM call failed: {exc_msg}")
                 raise
 
         raise last_exc

@@ -1,0 +1,211 @@
+{
+  "timestamp": "20261012_183139",
+  "model": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+  "pass_rate": 0.875,
+  "total_duration_s": 586.6666145324707,
+  "summary_by_difficulty": {
+    "easy": {
+      "total": 3,
+      "passed": 3,
+      "rate": 1.0
+    },
+    "medium": {
+      "total": 3,
+      "passed": 2,
+      "rate": 0.6666666666666666
+    },
+    "hard": {
+      "total": 2,
+      "passed": 2,
+      "rate": 1.0
+    }
+  },
+  "tasks": [
+    {
+      "name": "notepad_open",
+      "command": "open notepad",
+      "difficulty": "easy",
+      "passed": true,
+      "checks": [
+        {
+          "type": "process_running",
+          "passed": true,
+          "expected": "notepad.exe is running",
+          "actual": "found in tasklist",
+          "detail": "Notepad.exe                   9108 Console                    1   1,21,704 K"
+        },
+        {
+          "type": "window_title",
+          "passed": true,
+          "expected": "window title contains: Notepad",
+          "actual": "found",
+          "detail": "Settings\nBedrock Portal\nUser \u00fa Starfleet - Google Chrome\nknowledge.yaml - DullE - Visual Studio Code\nevaluation test.txteval_test.txt - Notepad\nC:\\Users\\subha\\Documents\\Rainmeter\\Skins\\illustro\\Disk\\1 Disk.ini\nSettings\nWindows Input Experience\nXBOX"
+        }
+      ],
+      "duration_s": 10.059846639633179,
+      "agent_completed": true,
+      "error": ""
+    },
+    {
+      "name": "notepad_type_hello",
+      "command": "open notepad and type hello world",
+      "difficulty": "easy",
+      "passed": true,
+      "checks": [
+        {
+          "type": "process_running",
+          "passed": true,
+          "expected": "notepad.exe is running",
+          "actual": "found in tasklist",
+          "detail": "Notepad.exe                  15216 Console                    1   1,27,232 K"
+        },
+        {
+          "type": "screen_text",
+          "passed": true,
+          "expected": "screen contains: hello world",
+          "actual": "found via clipboard",
+          "detail": "evaluation testhello world"
+        }
+      ],
+      "duration_s": 177.46657919883728,
+      "agent_completed": true,
+      "error": ""
+    },
+    {
+      "name": "calculator_open",
+      "command": "open calculator",
+      "difficulty": "easy",
+      "passed": true,
+      "checks": [
+        {
+          "type": "window_title",
+          "passed": true,
+          "expected": "window title contains: Calculator",
+          "actual": "found",
+          "detail": "Calculator\nBedrock Portal\nUser \u00fa Starfleet - Google Chrome\nknowledge.yaml - DullE - Visual Studio Code\nC:\\Users\\subha\\Documents\\Rainmeter\\Skins\\illustro\\Disk\\1 Disk.ini\nSettings\nWindows Input Experience\nXBOX"
+        }
+      ],
+      "duration_s": 9.147243022918701,
+      "agent_completed": true,
+      "error": ""
+    },
+    {
+      "name": "chrome_new_tab",
+      "command": "open chrome and go to google.com",
+      "difficulty": "medium",
+      "passed": true,
+      "checks": [
+        {
+          "type": "process_running",
+          "passed": true,
+          "expected": "chrome.exe is running",
+          "actual": "found in tasklist",
+          "detail": "chrome.exe                    2368 Console                    1   3,87,156 K\nchrome.exe                   12304 Console                    1      9,808 K\nchrome.exe                   21984 Console    "
+        },
+        {
+          "type": "screen_text",
+          "passed": true,
+          "expected": "screen contains: Google",
+          "actual": "found in window titles",
+          "detail": "Settings\nBedrock Portal\nGoogle - Google Chrome\nknowledge.yaml - DullE - Visual Studio Code\nC:\\Users\\subha\\Documents\\Rainmeter\\Skins\\illustro\\Disk\\1 Disk.ini\nSettings\nWindows Input Experience\nXBOX"
+        }
+      ],
+      "duration_s": 52.8324499130249,
+      "agent_completed": true,
+      "error": ""
+    },
+    {
+      "name": "create_folder",
+      "command": "create a folder called dulle_test_folder in my Downloads",
+      "difficulty": "medium",
+      "passed": false,
+      "checks": [
+        {
+          "type": "cli_output",
+          "passed": false,
+          "expected": "output contains: FOUND",
+          "actual": "not found",
+          "detail": "MISSING"
+        }
+      ],
+      "duration_s": 7.20653510093689,
+      "agent_completed": false,
+      "error": ""
+    },
+    {
+      "name": "notepad_save_file",
+      "command": "open notepad, type 'evaluation test', and save it as eval_test.txt in Downloads",
+      "difficulty": "medium",
+      "passed": true,
+      "checks": [
+        {
+          "type": "file_exists",
+          "passed": true,
+          "expected": "file exists: C:\\Users\\subha\\Downloads\\eval_test.txt",
+          "actual": "exists",
+          "detail": ""
+        },
+        {
+          "type": "cli_output",
+          "passed": true,
+          "expected": "output contains: evaluation test",
+          "actual": "found",
+          "detail": "evaluation test"
+        }
+      ],
+      "duration_s": 111.55660510063171,
+      "agent_completed": true,
+      "error": ""
+    },
+    {
+      "name": "chrome_youtube_search",
+      "command": "open chrome, go to youtube.com and search for 'lofi music'",
+      "difficulty": "hard",
+      "passed": true,
+      "checks": [
+        {
+          "type": "process_running",
+          "passed": true,
+          "expected": "chrome.exe is running",
+          "actual": "found in tasklist",
+          "detail": "chrome.exe                    3212 Console                    1   3,40,808 K\nchrome.exe                   30812 Console                    1      9,832 K\nchrome.exe                    7268 Console    "
+        },
+        {
+          "type": "screen_text",
+          "passed": true,
+          "expected": "screen contains: lofi",
+          "actual": "found via clipboard",
+          "detail": "\r\n\r\nin\r\n\r\nskip navigation\r\nlofi music\r\n\r\n\r\n\r\n\r\ncreate\r\n\r\n9+\r\n\r\navatar image\r\nhome\r\nshorts\r\nsubscriptions\r\n\r\nyou\r\n\r\n\r\nall\r\n\r\nshorts\r\n\r\nunwatched\r\n\r\nvideos\r\n\r\nrecently uploaded\r\n\r\nlive\r\n\r\nfilters\r\ntrue\r"
+        }
+      ],
+      "duration_s": 147.99066495895386,
+      "agent_completed": true,
+      "error": ""
+    },
+    {
+      "name": "word_write_letter",
+      "command": "open word, type a short 3-line letter to my friend about the weather, the letter should start with Dear Friend",
+      "difficulty": "hard",
+      "passed": true,
+      "checks": [
+        {
+          "type": "process_running",
+          "passed": true,
+          "expected": "WINWORD.exe is running",
+          "actual": "found in tasklist",
+          "detail": "WINWORD.EXE                   6756 Console                    1   2,49,200 K"
+        },
+        {
+          "type": "screen_text",
+          "passed": true,
+          "expected": "screen contains: Dear Friend",
+          "actual": "found via clipboard",
+          "detail": "dear friend\r\n\r\nthe weather today is absolutely beautiful with clear skies and pleasant temperatures. i hope you are enjoying such wonderful weather as well.\r\n\r\ni look forward to hearing from you soon "
+        }
+      ],
+      "duration_s": 35.44796371459961,
+      "agent_completed": true,
+      "error": ""
+    }
+  ]
+}

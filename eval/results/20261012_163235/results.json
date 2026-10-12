@@ -1,0 +1,40 @@
+{
+  "timestamp": "20261012_163235",
+  "model": "global.anthropic.claude-sonnet-4-6",
+  "pass_rate": 0.0,
+  "total_duration_s": 109.46179986000061,
+  "summary_by_difficulty": {
+    "easy": {
+      "total": 1,
+      "passed": 0,
+      "rate": 0.0
+    }
+  },
+  "tasks": [
+    {
+      "name": "notepad_open",
+      "command": "open notepad",
+      "difficulty": "easy",
+      "passed": false,
+      "checks": [
+        {
+          "type": "process_running",
+          "passed": false,
+          "expected": "notepad.exe is running",
+          "actual": "not found in tasklist",
+          "detail": "ERROR: Invalid argument/option - 'eq'.\nType \"TASKLIST /?\" for usage."
+        },
+        {
+          "type": "window_title",
+          "passed": false,
+          "expected": "window title contains: Notepad",
+          "actual": "not found",
+          "detail": "Get-Process | Where-Object {.MainWindowTitle} | Select-Object -ExpandProperty MainWindowTitle"
+        }
+      ],
+      "duration_s": 34.904895305633545,
+      "agent_completed": true,
+      "error": ""
+    }
+  ]
+}

@@ -24,6 +24,10 @@
   tags: [youtube, video, music, premium, ads]
   app: chrome
   context: "Skip any ad-handling steps when planning YouTube tasks"
+- fact: "I always use the chrome profile name 'Person 1' that third profile, when browsing"
+  tags: [youtube, video, music, premium, ads]
+  app: chrome
+  context: "Don't open any other profile while browsing chrome"
 
 - fact: "I have Spotify Premium — I can play any song on demand without shuffle"
   tags: [spotify, music, premium, songs, playlist]

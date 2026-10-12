@@ -3,18 +3,32 @@
 Entry point for the CLI. Run with:
     python -m dulle "open word and write a letter"
     python -m dulle              # interactive mode
+    python -m dulle --eval       # run eval suite
+    python -m dulle --eval --tasks notepad_open,calculator_open
+    python -m dulle --eval-compare eval/results/20261012_120000 eval/results/20261012_130000
 """
 
 from __future__ import annotations
 
+import argparse
 import sys
 
+import pyautogui
 from loguru import logger
 from rich.console import Console
 from rich.panel import Panel
 
 from dulle.config import Settings
 from dulle.screen import enable_dpi_awareness
+
+
+def _release_keys():
+    """Release any modifier keys that might be held down after an interrupt."""
+    for key in ("ctrl", "shift", "alt", "win"):
+        try:
+            pyautogui.keyUp(key)
+        except Exception:
+            pass
 
 console = Console()
 
@@ -29,8 +43,32 @@ BANNER = r"""
 """
 
 
+def _parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="DullE — Windows Computer Use Agent",
+        usage="python -m dulle [command] | --eval | --eval-compare base current",
+    )
+    parser.add_argument("command", nargs="*", help="Task to execute")
+    parser.add_argument("--eval", action="store_true", help="Run the eval suite")
+    parser.add_argument("--tasks", type=str, default=None,
+                        help="Comma-separated task names to run (with --eval)")
+    parser.add_argument("--eval-file", type=str, default="eval_tasks.yaml",
+                        help="Path to eval tasks YAML")
+    parser.add_argument("--eval-compare", nargs=2, metavar=("BASELINE", "CURRENT"),
+                        help="Compare two eval result directories")
+    return parser.parse_args()
+
+
 def main():
     """Main entry point."""
+    args = _parse_args()
+
+    # Handle eval-compare (no agent needed)
+    if args.eval_compare:
+        from dulle.eval.report import compare
+        compare(args.eval_compare[0], args.eval_compare[1])
+        return
+
     # DPI awareness must be set before any screen capture
     enable_dpi_awareness()
 
@@ -76,14 +114,32 @@ def main():
     # Print config summary
     _print_config(settings)
 
+    # Eval mode
+    if args.eval:
+        # Disable confirmation gates during eval
+        settings.require_confirmation = False
+        settings.require_shell_confirmation = False
+
+        from dulle.eval.runner import run_eval
+        run_eval(
+            settings,
+            task_file=args.eval_file,
+            task_filter=args.tasks,
+        )
+        return
+
     # Import agent here (after DPI awareness is set)
     from dulle.agent import DullEAgent
     agent = DullEAgent(settings)
 
     # Check for command-line argument
-    if len(sys.argv) > 1:
-        command = " ".join(sys.argv[1:])
-        agent.run(command)
+    if args.command:
+        command = " ".join(args.command)
+        try:
+            agent.run(command)
+        except KeyboardInterrupt:
+            _release_keys()
+            console.print("\n[yellow bold]Task aborted by Ctrl+C.[/]")
         return
 
     # Interactive mode
@@ -114,7 +170,10 @@ def main():
                 f"duration={result.duration_s:.1f}s{token_info}"
             )
         except KeyboardInterrupt:
-            console.print("\n[yellow]Task interrupted. Keyboard/mouse state cleaned up.[/]")
+            _release_keys()
+            console.print("\n[yellow bold]Task aborted by Ctrl+C.[/]")
+            console.print("[dim]Keyboard/mouse state cleaned up.[/]")
+            logger.info("Task aborted by user (Ctrl+C)")
         except Exception as exc:
             console.print(f"\n[red]Error:[/] {exc}")
             logger.exception("Task failed")

@@ -31,5 +31,6 @@ Thumbs.db
 Desktop.ini
 .DS_Store
 dulle.log
-knowledge.yml
+/knowledge.yaml
 Resources/
+knowledge.yaml

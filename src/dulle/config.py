@@ -27,6 +27,7 @@ class Settings(BaseSettings):
     max_steps: int = 20
     max_tokens: int = 4096
     step_timeout_s: float = 120.0
+    llm_timeout_s: float = 60.0
 
     # ── Execution mode ───────────────────────────────────────────
     execution_mode: str = "hybrid"

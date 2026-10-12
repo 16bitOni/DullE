@@ -1,0 +1,124 @@
+# ─────────────────────────────────────────────────────────────
+# DullE — Evaluation Task Suite
+# ─────────────────────────────────────────────────────────────
+#
+# Each task defines:
+#   name:      Unique identifier
+#   command:   What to tell the agent
+#   timeout:   Max seconds for the whole task
+#   difficulty: easy / medium / hard (for reporting)
+#   cleanup:   Commands to run BEFORE the test to ensure clean state
+#   checks:    How to verify the result (run after agent finishes)
+#
+# Check types:
+#   process_running  — is a process alive? (via tasklist)
+#   process_not_running — is a process gone?
+#   file_exists      — does a file exist at path?
+#   file_not_exists  — file should NOT exist
+#   window_title     — any window title contains text?
+#   screen_text      — OCR the screen, look for text
+#   cli_output       — run a command, check if output contains text
+#
+# ─────────────────────────────────────────────────────────────
+
+# ── Easy tasks ───────────────────────────────────────────────
+
+- name: notepad_open
+  command: "open notepad"
+  timeout: 30
+  difficulty: easy
+  cleanup:
+    - "taskkill /f /im notepad.exe >nul 2>&1"
+  checks:
+    - type: process_running
+      process: notepad.exe
+    - type: window_title
+      text: "Notepad"
+
+- name: notepad_type_hello
+  command: "open notepad and type hello world"
+  timeout: 45
+  difficulty: easy
+  cleanup:
+    - "taskkill /f /im notepad.exe >nul 2>&1"
+  checks:
+    - type: process_running
+      process: notepad.exe
+    - type: screen_text
+      text: "hello world"
+
+- name: calculator_open
+  command: "open calculator"
+  timeout: 30
+  difficulty: easy
+  cleanup:
+    - "taskkill /f /im Calculator.exe >nul 2>&1"
+    - "taskkill /f /im CalculatorApp.exe >nul 2>&1"
+  checks:
+    - type: window_title
+      text: "Calculator"
+
+# ── Medium tasks ─────────────────────────────────────────────
+
+- name: chrome_new_tab
+  command: "open chrome and go to google.com"
+  timeout: 60
+  difficulty: medium
+  cleanup:
+    - "taskkill /f /im chrome.exe >nul 2>&1"
+  checks:
+    - type: process_running
+      process: chrome.exe
+    - type: screen_text
+      text: "Google"
+
+- name: create_folder
+  command: "create a folder called dulle_test_folder in my Downloads"
+  timeout: 45
+  difficulty: medium
+  cleanup:
+    - "rmdir /s /q C:\\Users\\subha\\Downloads\\dulle_test_folder >nul 2>&1"
+  checks:
+    - type: cli_output
+      command: "if exist C:\\Users\\subha\\Downloads\\dulle_test_folder (echo FOUND) else (echo MISSING)"
+      contains: "FOUND"
+
+- name: notepad_save_file
+  command: "open notepad, type 'evaluation test', and save it as eval_test.txt in Downloads"
+  timeout: 90
+  difficulty: medium
+  cleanup:
+    - "taskkill /f /im notepad.exe >nul 2>&1"
+    - "del C:\\Users\\subha\\Downloads\\eval_test.txt >nul 2>&1"
+  checks:
+    - type: file_exists
+      path: "C:\\Users\\subha\\Downloads\\eval_test.txt"
+    - type: cli_output
+      command: "type C:\\Users\\subha\\Downloads\\eval_test.txt"
+      contains: "evaluation test"
+
+# ── Hard tasks ───────────────────────────────────────────────
+
+- name: chrome_youtube_search
+  command: "open chrome, go to youtube.com and search for 'lofi music'"
+  timeout: 90
+  difficulty: hard
+  cleanup:
+    - "taskkill /f /im chrome.exe >nul 2>&1"
+  checks:
+    - type: process_running
+      process: chrome.exe
+    - type: screen_text
+      text: "lofi"
+
+- name: word_write_letter
+  command: "open word, type a short 3-line letter to my friend about the weather, the letter should start with Dear Friend"
+  timeout: 120
+  difficulty: hard
+  cleanup:
+    - "taskkill /f /im WINWORD.exe >nul 2>&1"
+  checks:
+    - type: process_running
+      process: WINWORD.exe
+    - type: screen_text
+      text: "Dear Friend"

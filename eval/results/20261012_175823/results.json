@@ -1,0 +1,211 @@
+{
+  "timestamp": "20261012_175823",
+  "model": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+  "pass_rate": 0.0,
+  "total_duration_s": 371.9902844429016,
+  "summary_by_difficulty": {
+    "easy": {
+      "total": 3,
+      "passed": 0,
+      "rate": 0.0
+    },
+    "medium": {
+      "total": 3,
+      "passed": 0,
+      "rate": 0.0
+    },
+    "hard": {
+      "total": 2,
+      "passed": 0,
+      "rate": 0.0
+    }
+  },
+  "tasks": [
+    {
+      "name": "notepad_open",
+      "command": "open notepad",
+      "difficulty": "easy",
+      "passed": false,
+      "checks": [
+        {
+          "type": "process_running",
+          "passed": false,
+          "expected": "notepad.exe is running",
+          "actual": "not found in tasklist",
+          "detail": "ERROR: Invalid argument/option - 'eq'.\nType \"TASKLIST /?\" for usage."
+        },
+        {
+          "type": "window_title",
+          "passed": false,
+          "expected": "window title contains: Notepad",
+          "actual": "not found",
+          "detail": "Get-Process | Where-Object {.MainWindowTitle} | Select-Object -ExpandProperty MainWindowTitle"
+        }
+      ],
+      "duration_s": 12.129756927490234,
+      "agent_completed": true,
+      "error": ""
+    },
+    {
+      "name": "notepad_type_hello",
+      "command": "open notepad and type hello world",
+      "difficulty": "easy",
+      "passed": false,
+      "checks": [
+        {
+          "type": "process_running",
+          "passed": false,
+          "expected": "notepad.exe is running",
+          "actual": "not found in tasklist",
+          "detail": "ERROR: Invalid argument/option - 'eq'.\nType \"TASKLIST /?\" for usage."
+        },
+        {
+          "type": "screen_text",
+          "passed": true,
+          "expected": "screen contains: hello world",
+          "actual": "found via clipboard",
+          "detail": "hello world"
+        }
+      ],
+      "duration_s": 16.974132537841797,
+      "agent_completed": true,
+      "error": ""
+    },
+    {
+      "name": "calculator_open",
+      "command": "open calculator",
+      "difficulty": "easy",
+      "passed": false,
+      "checks": [
+        {
+          "type": "window_title",
+          "passed": false,
+          "expected": "window title contains: Calculator",
+          "actual": "not found",
+          "detail": "Get-Process | Where-Object {.MainWindowTitle} | Select-Object -ExpandProperty MainWindowTitle"
+        }
+      ],
+      "duration_s": 8.055397272109985,
+      "agent_completed": true,
+      "error": ""
+    },
+    {
+      "name": "chrome_new_tab",
+      "command": "open chrome and go to google.com",
+      "difficulty": "medium",
+      "passed": false,
+      "checks": [
+        {
+          "type": "process_running",
+          "passed": false,
+          "expected": "chrome.exe is running",
+          "actual": "not found in tasklist",
+          "detail": "ERROR: Invalid argument/option - 'eq'.\nType \"TASKLIST /?\" for usage."
+        },
+        {
+          "type": "screen_text",
+          "passed": false,
+          "expected": "screen contains: Google",
+          "actual": "not found via clipboard or window titles",
+          "detail": "- fact: \"i have youtube premium \u2014 there are no ads, no need to look for skip buttons or close ad overlays\"\r\n  tags: [youtube, video, music, premium, ads]\r\n  app: chrome\r\n  context: \"skip any ad-handli"
+        }
+      ],
+      "duration_s": 104.79218411445618,
+      "agent_completed": true,
+      "error": ""
+    },
+    {
+      "name": "create_folder",
+      "command": "create a folder called dulle_test_folder in my Downloads",
+      "difficulty": "medium",
+      "passed": false,
+      "checks": [
+        {
+          "type": "cli_output",
+          "passed": false,
+          "expected": "output contains: FOUND",
+          "actual": "not found",
+          "detail": "MISSING"
+        }
+      ],
+      "duration_s": 6.059641599655151,
+      "agent_completed": false,
+      "error": ""
+    },
+    {
+      "name": "notepad_save_file",
+      "command": "open notepad, type 'evaluation test', and save it as eval_test.txt in Downloads",
+      "difficulty": "medium",
+      "passed": false,
+      "checks": [
+        {
+          "type": "file_exists",
+          "passed": false,
+          "expected": "file exists: C:\\Users\\subha\\Downloads\\eval_test.txt",
+          "actual": "not found",
+          "detail": ""
+        },
+        {
+          "type": "cli_output",
+          "passed": false,
+          "expected": "output contains: evaluation test",
+          "actual": "not found",
+          "detail": "The system cannot find the file specified."
+        }
+      ],
+      "duration_s": 58.925681591033936,
+      "agent_completed": true,
+      "error": ""
+    },
+    {
+      "name": "chrome_youtube_search",
+      "command": "open chrome, go to youtube.com and search for 'lofi music'",
+      "difficulty": "hard",
+      "passed": false,
+      "checks": [
+        {
+          "type": "process_running",
+          "passed": false,
+          "expected": "chrome.exe is running",
+          "actual": "not found in tasklist",
+          "detail": "ERROR: Invalid argument/option - 'eq'.\nType \"TASKLIST /?\" for usage."
+        },
+        {
+          "type": "screen_text",
+          "passed": false,
+          "expected": "screen contains: lofi",
+          "actual": "not found via clipboard or window titles",
+          "detail": "- fact: \"i have youtube premium \u2014 there are no ads, no need to look for skip buttons or close ad overlays\"\r\n  tags: [youtube, video, music, premium, ads]\r\n  app: chrome\r\n  context: \"skip any ad-handli"
+        }
+      ],
+      "duration_s": 83.65349411964417,
+      "agent_completed": true,
+      "error": ""
+    },
+    {
+      "name": "word_write_letter",
+      "command": "open word, type a short 3-line letter to my friend about the weather, the letter should start with Dear Friend",
+      "difficulty": "hard",
+      "passed": false,
+      "checks": [
+        {
+          "type": "process_running",
+          "passed": false,
+          "expected": "WINWORD.exe is running",
+          "actual": "not found in tasklist",
+          "detail": "ERROR: Invalid argument/option - 'eq'.\nType \"TASKLIST /?\" for usage."
+        },
+        {
+          "type": "screen_text",
+          "passed": true,
+          "expected": "screen contains: Dear Friend",
+          "actual": "found via clipboard",
+          "detail": "dear friend,\r\n\r\nthe weather today is absolutely beautiful with clear blue skies and warm sunshine.\r\ni hope you are enjoying this pleasant weather as much as i am.\r\nthe forecast predicts continued nice"
+        }
+      ],
+      "duration_s": 27.190650701522827,
+      "agent_completed": true,
+      "error": ""
+    }
+  ]
+}

@@ -1,0 +1,211 @@
+{
+  "timestamp": "20261012_174658",
+  "model": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+  "pass_rate": 0.125,
+  "total_duration_s": 254.99001169204712,
+  "summary_by_difficulty": {
+    "easy": {
+      "total": 3,
+      "passed": 0,
+      "rate": 0.0
+    },
+    "medium": {
+      "total": 3,
+      "passed": 1,
+      "rate": 0.3333333333333333
+    },
+    "hard": {
+      "total": 2,
+      "passed": 0,
+      "rate": 0.0
+    }
+  },
+  "tasks": [
+    {
+      "name": "notepad_open",
+      "command": "open notepad",
+      "difficulty": "easy",
+      "passed": false,
+      "checks": [
+        {
+          "type": "process_running",
+          "passed": false,
+          "expected": "notepad.exe is running",
+          "actual": "not found in tasklist",
+          "detail": "ERROR: Invalid argument/option - 'eq'.\nType \"TASKLIST /?\" for usage."
+        },
+        {
+          "type": "window_title",
+          "passed": false,
+          "expected": "window title contains: Notepad",
+          "actual": "not found",
+          "detail": "Get-Process | Where-Object {.MainWindowTitle} | Select-Object -ExpandProperty MainWindowTitle"
+        }
+      ],
+      "duration_s": 7.724811315536499,
+      "agent_completed": true,
+      "error": ""
+    },
+    {
+      "name": "notepad_type_hello",
+      "command": "open notepad and type hello world",
+      "difficulty": "easy",
+      "passed": false,
+      "checks": [
+        {
+          "type": "process_running",
+          "passed": false,
+          "expected": "notepad.exe is running",
+          "actual": "not found in tasklist",
+          "detail": "ERROR: Invalid argument/option - 'eq'.\nType \"TASKLIST /?\" for usage."
+        },
+        {
+          "type": "screen_text",
+          "passed": true,
+          "expected": "screen contains: hello world",
+          "actual": "found via clipboard",
+          "detail": "hello world"
+        }
+      ],
+      "duration_s": 13.82246708869934,
+      "agent_completed": true,
+      "error": ""
+    },
+    {
+      "name": "calculator_open",
+      "command": "open calculator",
+      "difficulty": "easy",
+      "passed": false,
+      "checks": [
+        {
+          "type": "window_title",
+          "passed": false,
+          "expected": "window title contains: Calculator",
+          "actual": "not found",
+          "detail": "Get-Process | Where-Object {.MainWindowTitle} | Select-Object -ExpandProperty MainWindowTitle"
+        }
+      ],
+      "duration_s": 7.8836939334869385,
+      "agent_completed": true,
+      "error": ""
+    },
+    {
+      "name": "chrome_new_tab",
+      "command": "open chrome and go to google.com",
+      "difficulty": "medium",
+      "passed": false,
+      "checks": [
+        {
+          "type": "process_running",
+          "passed": false,
+          "expected": "chrome.exe is running",
+          "actual": "not found in tasklist",
+          "detail": "ERROR: Invalid argument/option - 'eq'.\nType \"TASKLIST /?\" for usage."
+        },
+        {
+          "type": "screen_text",
+          "passed": false,
+          "expected": "screen contains: Google",
+          "actual": "not found via clipboard or window titles",
+          "detail": "taskkill /im python.exe /f"
+        }
+      ],
+      "duration_s": 15.709337949752808,
+      "agent_completed": false,
+      "error": "'dict' object has no attribute 'lower'"
+    },
+    {
+      "name": "create_folder",
+      "command": "create a folder called dulle_test_folder in my Downloads",
+      "difficulty": "medium",
+      "passed": false,
+      "checks": [
+        {
+          "type": "cli_output",
+          "passed": false,
+          "expected": "output contains: FOUND",
+          "actual": "not found",
+          "detail": "MISSING"
+        }
+      ],
+      "duration_s": 5.948037385940552,
+      "agent_completed": false,
+      "error": ""
+    },
+    {
+      "name": "notepad_save_file",
+      "command": "open notepad, type 'evaluation test', and save it as eval_test.txt in Downloads",
+      "difficulty": "medium",
+      "passed": true,
+      "checks": [
+        {
+          "type": "file_exists",
+          "passed": true,
+          "expected": "file exists: C:\\Users\\subha\\Downloads\\eval_test.txt",
+          "actual": "exists",
+          "detail": ""
+        },
+        {
+          "type": "cli_output",
+          "passed": true,
+          "expected": "output contains: evaluation test",
+          "actual": "found",
+          "detail": "evaluation test"
+        }
+      ],
+      "duration_s": 55.178560733795166,
+      "agent_completed": true,
+      "error": ""
+    },
+    {
+      "name": "chrome_youtube_search",
+      "command": "open chrome, go to youtube.com and search for 'lofi music'",
+      "difficulty": "hard",
+      "passed": false,
+      "checks": [
+        {
+          "type": "process_running",
+          "passed": false,
+          "expected": "chrome.exe is running",
+          "actual": "not found in tasklist",
+          "detail": "ERROR: Invalid argument/option - 'eq'.\nType \"TASKLIST /?\" for usage."
+        },
+        {
+          "type": "screen_text",
+          "passed": false,
+          "expected": "screen contains: lofi",
+          "actual": "not found via clipboard or window titles",
+          "detail": "taskkill /im python.exe /f"
+        }
+      ],
+      "duration_s": 16.627063035964966,
+      "agent_completed": false,
+      "error": "'dict' object has no attribute 'lower'"
+    },
+    {
+      "name": "word_write_letter",
+      "command": "open word, type a short 3-line letter to my friend about the weather, the letter should start with Dear Friend",
+      "difficulty": "hard",
+      "passed": false,
+      "checks": [
+        {
+          "type": "process_running",
+          "passed": false,
+          "expected": "WINWORD.exe is running",
+          "actual": "not found in tasklist",
+          "detail": "ERROR: Invalid argument/option - 'eq'.\nType \"TASKLIST /?\" for usage."
+        },
+        {
+          "type": "screen_text",
+          "passed": true,
+          "expected": "screen contains: Dear Friend",
+          "actual": "found via clipboard",
+          "detail": "dear friend,\r\n\r\nthe weather today has been absolutely beautiful with clear skies and pleasant temperatures throughout the day.\r\ni hope you are enjoying similar wonderful weather where you are, as it t"
+        }
+      ],
+      "duration_s": 77.56965470314026,
+      "agent_completed": true,
+      "error": ""
+    }
+  ]
+}

@@ -12,9 +12,7 @@ Orchestrates the plan-execute-verify cycle:
 from __future__ import annotations
 
 import json
-import signal
 import time
-from contextlib import contextmanager
 from datetime import datetime
 from typing import Any
 
@@ -151,44 +149,6 @@ def _prune_old_images(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return pruned
 
 
-# ── Graceful interrupt ───────────────────────────────────────────
-
-class _InterruptRequested(Exception):
-    """Raised when the user presses Ctrl+C during a step."""
-    pass
-
-
-def _release_all_keys():
-    """Release any keys that might be held down after an interrupt."""
-    for key in ("ctrl", "shift", "alt", "win"):
-        try:
-            pyautogui.keyUp(key)
-        except Exception:
-            pass
-
-
-@contextmanager
-def _interrupt_guard():
-    """Context manager that catches Ctrl+C and cleans up pyautogui state."""
-    interrupted = False
-
-    def _handler(signum, frame):
-        nonlocal interrupted
-        interrupted = True
-        raise _InterruptRequested()
-
-    old_handler = signal.signal(signal.SIGINT, _handler)
-    try:
-        yield
-    except _InterruptRequested:
-        pass
-    finally:
-        signal.signal(signal.SIGINT, old_handler)
-        if interrupted:
-            _release_all_keys()
-            raise KeyboardInterrupt("Task interrupted by user.")
-
-
 # ── Agent ────────────────────────────────────────────────────────
 
 class DullEAgent:
@@ -213,6 +173,7 @@ class DullEAgent:
             f"[bold cyan]{user_command}[/]",
             title="DullE Task", border_style="cyan",
         ))
+        console.print("[dim]Press Ctrl+C at any time to abort the task.[/]\n")
 
         # ── Phase 1: Plan ────────────────────────────────────────
         console.print("\n[bold yellow]Phase 1:[/] Planning steps...\n")
@@ -235,9 +196,11 @@ class DullEAgent:
             if screen_desc:
                 console.print(f"  [dim]Screen: {screen_desc[:120]}[/]")
         except Exception as exc:
+            console.print(f"  [yellow]Screen scan failed (non-fatal):[/] {exc}")
             logger.warning(f"Screen description failed (non-fatal): {exc}")
 
         try:
+            console.print("  [dim]Generating plan...[/]")
             steps = plan_task(
                 user_command, self.llm,
                 self.screen.info, self.settings,
@@ -316,26 +279,25 @@ class DullEAgent:
         """Execute a single step. Returns True if succeeded."""
         mode = step.action_type
 
-        with _interrupt_guard():
-            if mode == ActionType.CLI and step.cli_command:
-                return self._execute_cli_step(step, audit)
-            elif mode == ActionType.GUI:
-                return self._execute_gui_step(step, audit)
-            elif mode == ActionType.VERIFY:
-                return self._execute_verify_step(step, audit)
-            elif mode == ActionType.WAIT:
-                wait_s = 3 if "load" in step.description.lower() else 2
-                time.sleep(wait_s)
-                step.result = f"Waited {wait_s}s."
-                return True
-            else:
-                # Hybrid: try CLI first if there's a hint, then GUI
-                if step.cli_command:
-                    ok = self._execute_cli_step(step, audit)
-                    if ok:
-                        return True
-                    console.print("  [yellow]CLI didn't work, trying GUI...[/]")
-                return self._execute_gui_step(step, audit)
+        if mode == ActionType.CLI and step.cli_command:
+            return self._execute_cli_step(step, audit)
+        elif mode == ActionType.GUI:
+            return self._execute_gui_step(step, audit)
+        elif mode == ActionType.VERIFY:
+            return self._execute_verify_step(step, audit)
+        elif mode == ActionType.WAIT:
+            wait_s = 3 if "load" in step.description.lower() else 2
+            time.sleep(wait_s)
+            step.result = f"Waited {wait_s}s."
+            return True
+        else:
+            # Hybrid: try CLI first if there's a hint, then GUI
+            if step.cli_command:
+                ok = self._execute_cli_step(step, audit)
+                if ok:
+                    return True
+                console.print("  [yellow]CLI didn't work, trying GUI...[/]")
+            return self._execute_gui_step(step, audit)
 
     def _execute_cli_step(self, step: Step, audit: AuditTrail) -> bool:
         """Run a CLI command directly."""
@@ -344,7 +306,7 @@ class DullEAgent:
             step.error = "No CLI command."
             return False
 
-        console.print(f"  [dim]$ {cmd}[/]")
+        console.print(f"  [bold blue]Running:[/] [cyan]$ {cmd}[/]")
         result = run_command(
             cmd, self.settings,
             skip_confirmation=False,
@@ -377,12 +339,14 @@ class DullEAgent:
         its own previous actions and results. It also detects loops
         and injects correction messages.
         """
+        console.print(f"  [bold blue]GUI mode:[/] Starting vision-based execution...")
         sys_prompt = executor_system(self.screen.info)
         if self._knowledge_text:
             sys_prompt += "\n\n" + self._knowledge_text
         step_deadline = time.monotonic() + self.settings.step_timeout_s
 
         # Take initial screenshot
+        console.print(f"  [dim]Capturing screen...[/]")
         screenshot_b64 = self.screen.capture()
         audit.save_screenshot(screenshot_b64, step.index, 0,
                               fmt=self.settings.screenshot_format)
@@ -401,6 +365,8 @@ class DullEAgent:
 
         # Track actions for loop detection
         action_history: list[dict] = []
+        consecutive_llm_failures = 0
+        MAX_CONSECUTIVE_LLM_FAILURES = 2
 
         for iteration in range(self.settings.max_iterations):
             # ── Check step timeout ───────────────────────────────
@@ -411,8 +377,8 @@ class DullEAgent:
                 return False
 
             console.print(
-                f"  [dim][{iteration + 1}/{self.settings.max_iterations} "
-                f"· {remaining:.0f}s left][/]"
+                f"  [bold cyan]Iteration {iteration + 1}/{self.settings.max_iterations}[/] "
+                f"[dim]({remaining:.0f}s remaining)[/]"
             )
 
             # ── Check for loops and inject correction ────────────
@@ -442,10 +408,25 @@ class DullEAgent:
                     temperature=0.2,
                     json_mode=True,
                 )
+                consecutive_llm_failures = 0
             except Exception as exc:
+                consecutive_llm_failures += 1
                 logger.error(f"LLM call failed: {exc}")
-                step.error = f"LLM error: {exc}"
-                return False
+                console.print(
+                    f"  [red bold]LLM call failed "
+                    f"({consecutive_llm_failures}/{MAX_CONSECUTIVE_LLM_FAILURES}):[/] {exc}"
+                )
+                if consecutive_llm_failures >= MAX_CONSECUTIVE_LLM_FAILURES:
+                    step.error = (
+                        f"Aborting — LLM failed {consecutive_llm_failures} times in a row: {exc}"
+                    )
+                    console.print(
+                        f"  [red bold]Aborting step:[/] Model is not responding. "
+                        f"Check your API endpoint and model name."
+                    )
+                    return False
+                console.print(f"  [yellow]Will retry on next iteration...[/]")
+                continue
 
             action_dict = parse_json_response(raw)
 
@@ -543,6 +524,7 @@ class DullEAgent:
         Retries with increasing delays — pages and apps often need a few
         seconds to finish rendering.
         """
+        console.print(f"  [bold blue]Verifying:[/] Checking screen state...")
         sys_prompt = verifier_system()
         delays = [0, 3, 5]  # seconds to wait before each attempt
 
@@ -571,6 +553,7 @@ class DullEAgent:
                     role="verifier",
                 )
             except Exception as exc:
+                console.print(f"  [red]Verification LLM error:[/] {exc}")
                 step.error = f"Verification LLM error: {exc}"
                 return False
 
