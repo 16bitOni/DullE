@@ -276,28 +276,36 @@ class DullEAgent:
     # ── Step execution ───────────────────────────────────────────
 
     def _execute_step(self, step: Step, audit: AuditTrail) -> bool:
-        """Execute a single step. Returns True if succeeded."""
+        """Execute a single step. Returns True if succeeded.
+
+        CLI-first: always try CLI when a command hint exists, regardless of
+        action_type. Only fall back to GUI if CLI fails or isn't available.
+        """
         mode = step.action_type
 
-        if mode == ActionType.CLI and step.cli_command:
-            return self._execute_cli_step(step, audit)
-        elif mode == ActionType.GUI:
-            return self._execute_gui_step(step, audit)
-        elif mode == ActionType.VERIFY:
+        if mode == ActionType.VERIFY:
             return self._execute_verify_step(step, audit)
-        elif mode == ActionType.WAIT:
+        if mode == ActionType.WAIT:
             wait_s = 3 if "load" in step.description.lower() else 2
             time.sleep(wait_s)
             step.result = f"Waited {wait_s}s."
             return True
-        else:
-            # Hybrid: try CLI first if there's a hint, then GUI
-            if step.cli_command:
-                ok = self._execute_cli_step(step, audit)
-                if ok:
-                    return True
-                console.print("  [yellow]CLI didn't work, trying GUI...[/]")
-            return self._execute_gui_step(step, audit)
+
+        # CLI-first: try CLI whenever a command hint exists
+        if step.cli_command:
+            ok = self._execute_cli_step(step, audit)
+            if ok:
+                return True
+            if mode == ActionType.CLI:
+                return False
+            console.print("  [yellow]CLI didn't work, falling back to GUI...[/]")
+
+        if mode == ActionType.CLI:
+            step.error = "No CLI command provided."
+            return False
+
+        # GUI fallback for gui/hybrid steps
+        return self._execute_gui_step(step, audit)
 
     def _execute_cli_step(self, step: Step, audit: AuditTrail) -> bool:
         """Run a CLI command directly."""
@@ -432,87 +440,41 @@ class DullEAgent:
 
             if "error" in action_dict and "raw" in action_dict:
                 logger.warning(f"Failed to parse: {action_dict['raw'][:100]}")
-                # Tell the model its response was bad and try again
                 conversation.append({"role": "assistant", "content": raw})
                 conversation.append({
                     "role": "user",
                     "content": "Your response was not valid JSON. Respond with "
                                "a single JSON object like: "
-                               '{"thought": "...", "action": "type", "text": "..."}',
+                               '{"thought": "...", "action": "type", "text": "..."} '
+                               'or a batch: {"thought": "...", "actions": [{...}, {...}]}',
                 })
                 continue
 
             thought = action_dict.get("thought", "")
-            action_type = action_dict.get("action", "")
             if thought:
                 console.print(f"  [dim italic]Think: {thought[:150]}[/]")
-            console.print(f"  [blue]Action:[/] {action_type} {_action_summary(action_dict)}")
 
             # Append assistant response to conversation
             conversation.append({"role": "assistant", "content": raw})
 
-            # Track for loop detection
-            action_history.append(action_dict)
-
-            # Save action to audit trail
-            audit.save_action(step.index, iteration, action_dict,
-                              {"thought": thought})
-
-            # ── Check if done ────────────────────────────────────
-            if action_type in ("done", "complete", "finished"):
-                step.result = action_dict.get("summary", "Step completed.")
-                return True
-
-            # ── Execute the action ───────────────────────────────
-            result = self.executor.execute(action_dict, confirm_callback=self._confirm)
-
-            # ── Build feedback message for the model ─────────────
-            if result.screenshot_b64:
-                # Action returned a screenshot (screenshot/zoom actions)
-                feedback_text = f"Action '{action_type}' executed. Here is the result."
-                audit.save_screenshot(result.screenshot_b64, step.index, iteration,
-                                      label="result", fmt=self.settings.screenshot_format)
-                conversation.append(
-                    _make_user_msg(feedback_text, result.screenshot_b64,
-                                   self.settings.screenshot_format)
+            # ── Detect batch vs single action ────────────────────
+            actions_list = action_dict.get("actions")
+            if isinstance(actions_list, list) and actions_list:
+                # BATCH MODE: execute all actions, screenshot once at end
+                done_result = self._execute_action_batch(
+                    actions_list, step, iteration, audit,
+                    action_history, conversation,
                 )
-            elif not result.success:
-                # Action failed — tell the model what went wrong
-                console.print(f"  [red]Error:[/] {result.error}")
-                conversation.append({
-                    "role": "user",
-                    "content": f"Action '{action_type}' FAILED: {result.error}\n"
-                               f"Try a different approach.",
-                })
+                if done_result is not None:
+                    return done_result
             else:
-                # Action succeeded — take a new screenshot so the model
-                # can see what changed
-                time.sleep(0.4)  # Brief pause for UI to update
-                new_screenshot = self.screen.capture()
-                audit.save_screenshot(new_screenshot, step.index, iteration,
-                                      label="after", fmt=self.settings.screenshot_format)
-                if action_type in ("type", "type_text"):
-                    typed_text = action_dict.get("text", "")
-                    feedback_text = (
-                        f"Action '{action_type}' executed: {result.output}\n"
-                        f"VERIFY: Check the screenshot — does the text "
-                        f"\"{typed_text[:60]}\" actually appear on screen? "
-                        f"If the wrong text appeared or nothing changed, the "
-                        f"typing may have failed — try clicking the text field "
-                        f"first, then type again."
-                    )
-                else:
-                    feedback_text = (
-                        f"Action '{action_type}' succeeded: {result.output}\n"
-                        f"Here is the screen AFTER the action. "
-                        f"Assess what changed and decide the next step. "
-                        f"If the task is complete, respond with "
-                        f"{{\"action\": \"done\"}}."
-                    )
-                conversation.append(
-                    _make_user_msg(feedback_text, new_screenshot,
-                                   self.settings.screenshot_format)
+                # SINGLE ACTION MODE
+                done_result = self._execute_single_action(
+                    action_dict, step, iteration, audit,
+                    action_history, conversation,
                 )
+                if done_result is not None:
+                    return done_result
 
         step.error = f"Hit iteration limit ({self.settings.max_iterations})."
         return False
@@ -583,6 +545,143 @@ class DullEAgent:
 
         step.error = result.get("issue", "Verification failed after retries.")
         return False
+
+    # ── Action execution helpers (single + batch) ─────────────────
+
+    def _execute_single_action(
+        self, action_dict: dict, step: Step, iteration: int,
+        audit: AuditTrail, action_history: list[dict],
+        conversation: list[dict],
+    ) -> bool | None:
+        """Execute one action. Returns True/False to stop, or None to continue."""
+        action_type = action_dict.get("action", "")
+        console.print(f"  [blue]Action:[/] {action_type} {_action_summary(action_dict)}")
+
+        action_history.append(action_dict)
+        audit.save_action(step.index, iteration, action_dict,
+                          {"thought": action_dict.get("thought", "")})
+
+        if action_type in ("done", "complete", "finished"):
+            step.result = action_dict.get("summary", "Step completed.")
+            return True
+
+        result = self.executor.execute(action_dict, confirm_callback=self._confirm)
+
+        if result.screenshot_b64:
+            feedback_text = f"Action '{action_type}' executed. Here is the result."
+            audit.save_screenshot(result.screenshot_b64, step.index, iteration,
+                                  label="result", fmt=self.settings.screenshot_format)
+            conversation.append(
+                _make_user_msg(feedback_text, result.screenshot_b64,
+                               self.settings.screenshot_format)
+            )
+        elif not result.success:
+            console.print(f"  [red]Error:[/] {result.error}")
+            conversation.append({
+                "role": "user",
+                "content": f"Action '{action_type}' FAILED: {result.error}\n"
+                           f"Try a different approach.",
+            })
+        else:
+            time.sleep(0.4)
+            new_screenshot = self.screen.capture()
+            audit.save_screenshot(new_screenshot, step.index, iteration,
+                                  label="after", fmt=self.settings.screenshot_format)
+            if action_type in ("type", "type_text"):
+                typed_text = action_dict.get("text", "")
+                feedback_text = (
+                    f"Action '{action_type}' executed: {result.output}\n"
+                    f"VERIFY: Check the screenshot — does the text "
+                    f"\"{typed_text[:60]}\" actually appear on screen? "
+                    f"If the wrong text appeared or nothing changed, the "
+                    f"typing may have failed — try clicking the text field "
+                    f"first, then type again."
+                )
+            else:
+                feedback_text = (
+                    f"Action '{action_type}' succeeded: {result.output}\n"
+                    f"Here is the screen AFTER the action. "
+                    f"Assess what changed and decide the next step. "
+                    f"If the task is complete, respond with "
+                    f"{{\"action\": \"done\"}}."
+                )
+            conversation.append(
+                _make_user_msg(feedback_text, new_screenshot,
+                               self.settings.screenshot_format)
+            )
+        return None
+
+    def _execute_action_batch(
+        self, actions: list[dict], step: Step, iteration: int,
+        audit: AuditTrail, action_history: list[dict],
+        conversation: list[dict],
+    ) -> bool | None:
+        """Execute a batch of actions, screenshot once at end.
+
+        Returns True/False to stop, or None to continue the loop.
+        """
+        console.print(f"  [bold magenta]Batch:[/] {len(actions)} actions")
+        batch_outputs = []
+
+        for i, sub_action in enumerate(actions):
+            action_type = sub_action.get("action", "")
+            console.print(
+                f"    [blue]({i+1}/{len(actions)})[/] {action_type} "
+                f"{_action_summary(sub_action)}"
+            )
+
+            action_history.append(sub_action)
+            audit.save_action(step.index, iteration, sub_action,
+                              {"batch_index": i, "batch_size": len(actions)})
+
+            if action_type in ("done", "complete", "finished"):
+                step.result = sub_action.get("summary", "Step completed.")
+                return True
+
+            result = self.executor.execute(
+                sub_action, confirm_callback=self._confirm
+            )
+            batch_outputs.append(f"  {i+1}. {action_type}: {result.output[:80]}")
+
+            if not result.success:
+                console.print(f"    [red]Error:[/] {result.error}")
+                # Batch failed mid-way — take screenshot and tell model
+                time.sleep(0.3)
+                new_screenshot = self.screen.capture()
+                audit.save_screenshot(new_screenshot, step.index, iteration,
+                                      label="batch_fail", fmt=self.settings.screenshot_format)
+                conversation.append(
+                    _make_user_msg(
+                        f"Batch action {i+1}/{len(actions)} FAILED "
+                        f"('{action_type}'): {result.error}\n"
+                        f"Actions completed before failure:\n"
+                        + "\n".join(batch_outputs[:-1])
+                        + "\nHere is the screen now. Try a different approach.",
+                        new_screenshot,
+                        self.settings.screenshot_format,
+                    )
+                )
+                return None
+
+            time.sleep(0.15)
+
+        # All actions succeeded — take one screenshot
+        time.sleep(0.4)
+        new_screenshot = self.screen.capture()
+        audit.save_screenshot(new_screenshot, step.index, iteration,
+                              label="batch_done", fmt=self.settings.screenshot_format)
+        conversation.append(
+            _make_user_msg(
+                f"All {len(actions)} batch actions succeeded:\n"
+                + "\n".join(batch_outputs)
+                + "\n\nHere is the screen AFTER the batch. "
+                f"Assess what changed. If the task is complete, respond with "
+                f"{{\"action\": \"done\"}}.",
+                new_screenshot,
+                self.settings.screenshot_format,
+            )
+        )
+        return None
 
     # ── Helpers ──────────────────────────────────────────────────
 
