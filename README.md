@@ -16,7 +16,8 @@ Give it a plain-English command. It controls your PC.
 
 [![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
 [![Platform](https://img.shields.io/badge/Platform-Windows%2010%2F11-0078D4?style=flat-square&logo=windows&logoColor=white)](https://microsoft.com/windows)
-[![Version](https://img.shields.io/badge/Version-0.1.0-22c55e?style=flat-square)](https://github.com)
+[![PyPI](https://img.shields.io/pypi/v/dulle?style=flat-square&color=22c55e)](https://pypi.org/project/dulle/)
+[![GitHub Release](https://img.shields.io/github/v/release/16bitOni/DullE?style=flat-square&color=22c55e)](https://github.com/16bitOni/DullE/releases/latest)
 [![License](https://img.shields.io/badge/License-MIT-f59e0b?style=flat-square)](LICENSE)
 [![uv](https://img.shields.io/badge/Packaged%20with-uv-7c3aed?style=flat-square)](https://docs.astral.sh/uv)
 
@@ -88,17 +89,39 @@ You: "open WhatsApp and send Subho a message introducing yourself"
 
 ---
 
-## Quick Start
+## Installation
 
-### 1 — Install
+### Option A — pip / pipx (requires Python 3.11+)
 
 ```bash
-git clone https://github.com/yourname/DullE.git
+pipx install dulle
+```
+
+or with pip:
+
+```bash
+pip install dulle
+```
+
+### Option B — Standalone .exe (no Python needed)
+
+Download `dulle.exe` from the [latest release](https://github.com/16bitOni/DullE/releases/latest), place it anywhere on your PATH, then skip straight to [Configure](#configure).
+
+### Option C — Developer install (source)
+
+```bash
+git clone https://github.com/16bitOni/DullE.git
 cd DullE
 uv sync
 ```
 
-### 2 — Configure
+All commands below use `dulle` (A/B) or `uv run dulle` (C) interchangeably.
+
+---
+
+## Quick Start
+
+### Configure
 
 ```bash
 copy .env.example .env
@@ -115,18 +138,18 @@ DULLE_EXECUTOR_MODEL=your-vision-model
 DULLE_VERIFIER_MODEL=your-reliable-model
 ```
 
-### 3 — Run
+### Run
 
 ```bash
 # Single command
-uv run dulle "open notepad and type hello world"
+dulle "open notepad and type hello world"
 
 # Interactive mode
-uv run dulle
+dulle
 
 # Auto mode — no confirmation prompts
-uv run dulle --auto
-uv run dulle -y "create a folder called test in Downloads"
+dulle --auto
+dulle -y "create a folder called test in Downloads"
 ```
 
 ---

@@ -1,6 +1,6 @@
 [project]
 name = "dulle"
-version = "0.1.0"
+version = "0.2.0"
 description = "Hybrid CLI + Vision Windows desktop automation agent"
 readme = "README.md"
 license = { text = "MIT" }

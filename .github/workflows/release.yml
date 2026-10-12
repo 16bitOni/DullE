@@ -11,9 +11,8 @@ jobs:
   pypi:
     name: Publish to PyPI
     runs-on: ubuntu-latest
-    environment: pypi
     permissions:
-      id-token: write   # Required for trusted publishing (no API token needed)
+      id-token: write   # Required for OIDC trusted publishing (no API token needed)
 
     steps:
       - uses: actions/checkout@v4
@@ -32,6 +31,8 @@ jobs:
   exe:
     name: Build Windows .exe
     runs-on: windows-latest
+    permissions:
+      contents: write   # Required to create releases and upload assets
 
     steps:
       - uses: actions/checkout@v4
